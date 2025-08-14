@@ -57,6 +57,12 @@ function setupEventListeners() {
         });
     });
 
+    // Download Excel Button
+    const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+    if (downloadExcelBtn) {
+        downloadExcelBtn.addEventListener('click', downloadExcelData);
+    }
+
     // Close sidebar when clicking outside on mobile
     document.addEventListener('click', (e) => {
         if (window.innerWidth <= 768 && 
@@ -1127,6 +1133,48 @@ async function handleStockSubmit(e) {
         showToast('Stock actualizado correctamente', 'success');
     } catch (error) {
         showToast('Error al actualizar el stock', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Download Excel Data Function
+async function downloadExcelData() {
+    showLoading();
+    try {
+        const response = await fetch(`${API_BASE}/export/excel`);
+        
+        if (!response.ok) {
+            throw new Error('Error al descargar archivo Excel');
+        }
+        
+        // Get filename from response headers
+        const contentDisposition = response.headers.get('content-disposition');
+        let filename = 'cafe_data_export.xlsx';
+        
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            }
+        }
+        
+        // Create blob and download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        showToast('Excel descargado correctamente', 'success');
+    } catch (error) {
+        console.error('Error downloading Excel:', error);
+        showToast('Error al descargar Excel', 'error');
     } finally {
         hideLoading();
     }

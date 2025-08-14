@@ -204,6 +204,13 @@ body {
     border-radius: 2px;
 }
 
+.dashboard-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
 .date-time {
     background: white;
     padding: 0.5rem 1rem;
