@@ -29,8 +29,9 @@ class GoogleSheetsHandler {
                 throw new Error('GOOGLE_SHEETS_ID environment variable not set');
             }
 
-            if (!fs.existsSync(this.credentialsPath)) {
-                throw new Error('Google credentials file not found. Please add google-credentials.json to project root');
+            // Check credentials - either from environment variable or file
+            if (!process.env.GOOGLE_CREDENTIALS && !fs.existsSync(this.credentialsPath)) {
+                throw new Error('Google credentials not found. Please set GOOGLE_CREDENTIALS environment variable or add google-credentials.json file');
             }
 
             await this.authenticate();
