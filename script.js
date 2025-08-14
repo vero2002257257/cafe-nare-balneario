@@ -8,6 +8,8 @@ let currentSale = {
     customer: null,
     total: 0
 };
+let isAdminMode = false;
+const ADMIN_PASSWORD = 'CAFE2024'; // Cambiar por una contraseña más segura
 
 // API Base URL
 const API_BASE = 'http://localhost:3000/api';
@@ -61,6 +63,12 @@ function setupEventListeners() {
     const downloadExcelBtn = document.getElementById('downloadExcelBtn');
     if (downloadExcelBtn) {
         downloadExcelBtn.addEventListener('click', downloadExcelData);
+    }
+
+    // Admin Toggle Button
+    const adminToggle = document.getElementById('adminToggle');
+    if (adminToggle) {
+        adminToggle.addEventListener('click', toggleAdminMode);
     }
 
     // Close sidebar when clicking outside on mobile
@@ -1138,8 +1146,60 @@ async function handleStockSubmit(e) {
     }
 }
 
+// Admin Mode Functions
+function toggleAdminMode(e) {
+    e.preventDefault();
+    
+    if (isAdminMode) {
+        // Salir del modo admin
+        exitAdminMode();
+    } else {
+        // Entrar al modo admin
+        enterAdminMode();
+    }
+}
+
+function enterAdminMode() {
+    const password = prompt('Introduce la contraseña de administrador:');
+    
+    if (password === ADMIN_PASSWORD) {
+        isAdminMode = true;
+        document.body.classList.add('admin-mode');
+        document.getElementById('adminToggleText').textContent = 'Salir Admin';
+        document.getElementById('adminToggle').classList.add('active');
+        
+        // Mostrar elementos solo para admin
+        document.querySelectorAll('.admin-only').forEach(element => {
+            element.style.display = 'block';
+        });
+        
+        showToast('Modo administrador activado', 'success');
+    } else if (password !== null) {
+        showToast('Contraseña incorrecta', 'error');
+    }
+}
+
+function exitAdminMode() {
+    isAdminMode = false;
+    document.body.classList.remove('admin-mode');
+    document.getElementById('adminToggleText').textContent = 'Modo Administrador';
+    document.getElementById('adminToggle').classList.remove('active');
+    
+    // Ocultar elementos solo para admin
+    document.querySelectorAll('.admin-only').forEach(element => {
+        element.style.display = 'none';
+    });
+    
+    showToast('Modo empleado activado', 'info');
+}
+
 // Download Excel Data Function
 async function downloadExcelData() {
+    if (!isAdminMode) {
+        showToast('Función solo disponible para administradores', 'warning');
+        return;
+    }
+    
     showLoading();
     try {
         const response = await fetch(`${API_BASE}/export/excel`);

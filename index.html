@@ -49,6 +49,11 @@
                 <i class="fas fa-users"></i>
                 <span>Clientes</span>
             </a></li>
+            <li class="menu-separator"></li>
+            <li><a href="#" class="menu-item admin-toggle" id="adminToggle">
+                <i class="fas fa-key"></i>
+                <span id="adminToggleText">Modo Administrador</span>
+            </a></li>
         </ul>
     </nav>
 
@@ -59,7 +64,7 @@
             <div class="section-header">
                 <h1>Dashboard</h1>
                 <div class="dashboard-actions">
-                    <button class="btn-secondary" id="downloadExcelBtn">
+                    <button class="btn-secondary admin-only" id="downloadExcelBtn" style="display: none;">
                         <i class="fas fa-download"></i>
                         Descargar Excel
                     </button>

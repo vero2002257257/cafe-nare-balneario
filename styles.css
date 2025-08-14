@@ -148,6 +148,27 @@ body {
     background: var(--coffee-green);
 }
 
+.menu-separator {
+    height: 1px;
+    background: rgba(139, 69, 19, 0.2);
+    margin: 1rem 2rem;
+}
+
+.admin-toggle {
+    border-top: 1px solid rgba(139, 69, 19, 0.1);
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+}
+
+.admin-toggle.active {
+    background: linear-gradient(90deg, var(--coffee-green), #7BA428);
+    color: white;
+}
+
+.admin-mode .admin-only {
+    display: block !important;
+}
+
 .menu-item i {
     margin-right: 1rem;
     font-size: 1.2rem;
