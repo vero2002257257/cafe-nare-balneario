@@ -244,15 +244,27 @@ class GoogleSheetsHandler {
 
     async updateProduct(productId, updateData) {
         try {
+            // Get products from Google Sheets (already converted to English)
             const products = await this.getProducts();
             const productIndex = products.findIndex(p => p.id === productId);
             
             if (productIndex === -1) return null;
             
+            // Update the product with new data
             products[productIndex] = { ...products[productIndex], ...updateData };
             
+            // Convert all products back to Spanish for Google Sheets
+            const convertedProducts = products.map(product => ({
+                id: product.id,
+                nombre: product.name,
+                categoria: product.category,
+                precio: product.price,
+                stock: product.stock,
+                descripcion: product.description || ''
+            }));
+            
             const headers = this.getSheetHeaders('products');
-            await this.writeSheet(this.ranges.products, products, headers);
+            await this.writeSheet(this.ranges.products, convertedProducts, headers);
             
             return products[productIndex];
         } catch (error) {
@@ -263,6 +275,7 @@ class GoogleSheetsHandler {
 
     async updateProductStock(productId, stockChange, isDecrement = false) {
         try {
+            // Get products from Google Sheets (already converted to English)
             const products = await this.getProducts();
             const productIndex = products.findIndex(p => p.id === productId);
             
@@ -276,8 +289,18 @@ class GoogleSheetsHandler {
             products[productIndex].stock = newStock;
             products[productIndex].updatedAt = new Date().toISOString();
             
+            // Convert all products back to Spanish for Google Sheets
+            const convertedProducts = products.map(product => ({
+                id: product.id,
+                nombre: product.name,
+                categoria: product.category,
+                precio: product.price,
+                stock: product.stock,
+                descripcion: product.description || ''
+            }));
+            
             const headers = this.getSheetHeaders('products');
-            await this.writeSheet(this.ranges.products, products, headers);
+            await this.writeSheet(this.ranges.products, convertedProducts, headers);
             
             return products[productIndex];
         } catch (error) {
@@ -288,6 +311,7 @@ class GoogleSheetsHandler {
 
     async deleteProduct(productId) {
         try {
+            // Get products from Google Sheets (already converted to English)
             const products = await this.getProducts();
             const productIndex = products.findIndex(p => p.id === productId);
             
@@ -295,8 +319,18 @@ class GoogleSheetsHandler {
             
             products.splice(productIndex, 1);
             
+            // Convert remaining products back to Spanish for Google Sheets
+            const convertedProducts = products.map(product => ({
+                id: product.id,
+                nombre: product.name,
+                categoria: product.category,
+                precio: product.price,
+                stock: product.stock,
+                descripcion: product.description || ''
+            }));
+            
             const headers = this.getSheetHeaders('products');
-            await this.writeSheet(this.ranges.products, products, headers);
+            await this.writeSheet(this.ranges.products, convertedProducts, headers);
             
             return true;
         } catch (error) {
@@ -350,6 +384,7 @@ class GoogleSheetsHandler {
 
     async updateCustomer(customerId, updateData) {
         try {
+            // Get customers from Google Sheets (already converted to English)
             const customers = await this.getCustomers();
             const customerIndex = customers.findIndex(c => c.id === customerId);
             
@@ -357,8 +392,17 @@ class GoogleSheetsHandler {
             
             customers[customerIndex] = { ...customers[customerIndex], ...updateData };
             
+            // Convert all customers back to Spanish for Google Sheets
+            const convertedCustomers = customers.map(customer => ({
+                id: customer.id,
+                nombre: customer.name,
+                telefono: customer.phone || '',
+                email: customer.email || '',
+                fechaRegistro: customer.createdAt || new Date().toISOString()
+            }));
+            
             const headers = this.getSheetHeaders('customers');
-            await this.writeSheet(this.ranges.customers, customers, headers);
+            await this.writeSheet(this.ranges.customers, convertedCustomers, headers);
             
             return customers[customerIndex];
         } catch (error) {
@@ -369,6 +413,7 @@ class GoogleSheetsHandler {
 
     async updateCustomerStats(customerId, saleTotal) {
         try {
+            // Get customers from Google Sheets (already converted to English)
             const customers = await this.getCustomers();
             const customerIndex = customers.findIndex(c => c.id === customerId);
             
@@ -380,8 +425,17 @@ class GoogleSheetsHandler {
             customer.lastPurchase = new Date().toISOString().split('T')[0];
             customer.updatedAt = new Date().toISOString();
             
+            // Convert all customers back to Spanish for Google Sheets
+            const convertedCustomers = customers.map(cust => ({
+                id: cust.id,
+                nombre: cust.name,
+                telefono: cust.phone || '',
+                email: cust.email || '',
+                fechaRegistro: cust.createdAt || new Date().toISOString()
+            }));
+            
             const headers = this.getSheetHeaders('customers');
-            await this.writeSheet(this.ranges.customers, customers, headers);
+            await this.writeSheet(this.ranges.customers, convertedCustomers, headers);
             
             return customer;
         } catch (error) {
@@ -392,6 +446,7 @@ class GoogleSheetsHandler {
 
     async deleteCustomer(customerId) {
         try {
+            // Get customers from Google Sheets (already converted to English)
             const customers = await this.getCustomers();
             const customerIndex = customers.findIndex(c => c.id === customerId);
             
@@ -399,8 +454,17 @@ class GoogleSheetsHandler {
             
             customers.splice(customerIndex, 1);
             
+            // Convert remaining customers back to Spanish for Google Sheets
+            const convertedCustomers = customers.map(customer => ({
+                id: customer.id,
+                nombre: customer.name,
+                telefono: customer.phone || '',
+                email: customer.email || '',
+                fechaRegistro: customer.createdAt || new Date().toISOString()
+            }));
+            
             const headers = this.getSheetHeaders('customers');
-            await this.writeSheet(this.ranges.customers, customers, headers);
+            await this.writeSheet(this.ranges.customers, convertedCustomers, headers);
             
             return true;
         } catch (error) {
