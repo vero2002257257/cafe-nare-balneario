@@ -200,13 +200,41 @@ class GoogleSheetsHandler {
 
     // Products methods
     async getProducts() {
-        return await this.readSheet(this.ranges.products);
+        try {
+            const products = await this.readSheet(this.ranges.products);
+            
+            // Convert Spanish field names to English for the application
+            return products.map(product => ({
+                id: product.id,
+                name: product.nombre,
+                category: product.categoria,
+                price: parseFloat(product.precio) || 0,
+                stock: parseInt(product.stock) || 0,
+                description: product.descripcion || '',
+                minStock: 5, // Default value
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            }));
+        } catch (error) {
+            console.error('Error getting products from Google Sheets:', error);
+            return [];
+        }
     }
 
     async addProduct(productData) {
         try {
+            // Convert English field names to Spanish for Google Sheets
+            const convertedData = {
+                id: productData.id,
+                nombre: productData.name,
+                categoria: productData.category,
+                precio: productData.price,
+                stock: productData.stock,
+                descripcion: productData.description || ''
+            };
+            
             const headers = this.getSheetHeaders('products');
-            await this.appendToSheet(this.ranges.products, [productData], headers);
+            await this.appendToSheet(this.ranges.products, [convertedData], headers);
             return productData;
         } catch (error) {
             console.error('Error adding product to Google Sheets:', error);
@@ -279,13 +307,40 @@ class GoogleSheetsHandler {
 
     // Customers methods
     async getCustomers() {
-        return await this.readSheet(this.ranges.customers);
+        try {
+            const customers = await this.readSheet(this.ranges.customers);
+            
+            // Convert Spanish field names to English for the application
+            return customers.map(customer => ({
+                id: customer.id,
+                name: customer.nombre,
+                phone: customer.telefono || '',
+                email: customer.email || '',
+                totalPurchases: parseInt(customer.totalPurchases) || 0,
+                totalSpent: parseFloat(customer.totalSpent) || 0,
+                lastPurchase: customer.lastPurchase || null,
+                createdAt: customer.fechaRegistro || new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            }));
+        } catch (error) {
+            console.error('Error getting customers from Google Sheets:', error);
+            return [];
+        }
     }
 
     async addCustomer(customerData) {
         try {
+            // Convert English field names to Spanish for Google Sheets
+            const convertedData = {
+                id: customerData.id,
+                nombre: customerData.name,
+                telefono: customerData.phone || '',
+                email: customerData.email || '',
+                fechaRegistro: customerData.createdAt || new Date().toISOString()
+            };
+            
             const headers = this.getSheetHeaders('customers');
-            await this.appendToSheet(this.ranges.customers, [customerData], headers);
+            await this.appendToSheet(this.ranges.customers, [convertedData], headers);
             return customerData;
         } catch (error) {
             console.error('Error adding customer to Google Sheets:', error);
