@@ -711,6 +711,10 @@ async function completeSale() {
         setTimeout(() => {
             if (confirm('¿Desea imprimir el ticket para el cliente?')) {
                 showTicket(saleData, customer);
+                // Auto-open print dialog after ticket is shown
+                setTimeout(() => {
+                    printTicket();
+                }, 300);
             }
         }, 500);
         
