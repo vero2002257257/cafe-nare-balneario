@@ -173,6 +173,132 @@ body {
     display: block !important;
 }
 
+/* Ticket Modal Styles */
+.ticket-modal {
+    max-width: 400px;
+    padding: 20px;
+}
+
+.ticket-content {
+    font-family: 'Courier New', monospace;
+    background: white;
+    padding: 15px;
+    border: 2px dashed #8B4513;
+    max-width: 300px;
+    margin: 0 auto;
+    line-height: 1.4;
+    font-size: 12px;
+}
+
+.ticket-header {
+    text-align: center;
+    border-bottom: 1px dashed #8B4513;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.ticket-title {
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ticket-info {
+    margin: 10px 0;
+    font-size: 11px;
+}
+
+.ticket-items {
+    border-top: 1px dashed #8B4513;
+    border-bottom: 1px dashed #8B4513;
+    padding: 10px 0;
+    margin: 10px 0;
+}
+
+.ticket-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 3px 0;
+    font-size: 11px;
+}
+
+.ticket-total {
+    text-align: right;
+    font-weight: bold;
+    font-size: 13px;
+    margin-top: 10px;
+    border-top: 1px dashed #8B4513;
+    padding-top: 5px;
+}
+
+.ticket-footer {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 10px;
+    border-top: 1px dashed #8B4513;
+    padding-top: 10px;
+}
+
+.ticket-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-print, .btn-cancel {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-print {
+    background-color: #8B4513;
+    color: white;
+}
+
+.btn-print:hover {
+    background-color: #A0522D;
+}
+
+.btn-cancel {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+/* Print styles for thermal printer */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    .ticket-content, .ticket-content * {
+        visibility: visible;
+    }
+    
+    .ticket-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 58mm; /* Standard thermal printer width */
+        font-size: 10px;
+        margin: 0;
+        padding: 5px;
+        border: none;
+    }
+    
+    .modal, .ticket-actions {
+        display: none !important;
+    }
+}
+
 .menu-item i {
     margin-right: 1rem;
     font-size: 1.2rem;

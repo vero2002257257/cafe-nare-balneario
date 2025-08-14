@@ -705,7 +705,15 @@ async function completeSale() {
     showLoading();
     try {
         await apiCall('/sales', 'POST', saleData);
-        showToast('Venta registrada correctamente', 'success');
+        showToast('Venta registrada correctamente ✓', 'success');
+        
+        // Show ticket option
+        setTimeout(() => {
+            if (confirm('¿Desea imprimir el ticket para el cliente?')) {
+                showTicket(saleData, customer);
+            }
+        }, 500);
+        
         cancelSale();
         renderSales();
         updateDashboard();
@@ -1239,3 +1247,114 @@ async function downloadExcelData() {
         hideLoading();
     }
 }
+
+// Ticket System Functions
+function generateTicketNumber() {
+    const now = new Date();
+    const timestamp = now.getTime().toString().slice(-6);
+    return `#${timestamp}`;
+}
+
+function generateTicket(saleData, customerData = null) {
+    const now = new Date();
+    const ticketNumber = generateTicketNumber();
+    
+    const ticketHTML = `
+        <div class="ticket-header">
+            <div class="ticket-title">CAFÉ NARE BALNEARIO</div>
+            <div>================================</div>
+        </div>
+        
+        <div class="ticket-info">
+            <div>Fecha: ${now.toLocaleDateString('es-CO')}</div>
+            <div>Hora: ${now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</div>
+            <div>Ticket: ${ticketNumber}</div>
+            <div>Cajero: Sistema</div>
+        </div>
+        
+        ${customerData ? `
+        <div class="ticket-info">
+            <div>Cliente: ${customerData.name || 'Cliente General'}</div>
+            ${customerData.phone ? `<div>Tel: ${customerData.phone}</div>` : ''}
+        </div>
+        ` : ''}
+        
+        <div class="ticket-items">
+            <div style="display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 3px; margin-bottom: 5px;">
+                <span>PRODUCTO</span>
+                <span>TOTAL</span>
+            </div>
+            ${saleData.items.map(item => `
+                <div class="ticket-item">
+                    <div style="flex: 1;">
+                        <div>${item.productName}</div>
+                        <div style="font-size: 10px; color: #666;">
+                            ${item.quantity} x $${item.price.toLocaleString('es-CO')}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        $${(item.price * item.quantity).toLocaleString('es-CO')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        
+        <div class="ticket-total">
+            <div style="display: flex; justify-content: space-between; margin: 3px 0;">
+                <span>SUBTOTAL:</span>
+                <span>$${saleData.total.toLocaleString('es-CO')}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 3px 0;">
+                <span>IVA (0%):</span>
+                <span>$0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 3px 0; font-size: 14px; border-top: 1px dashed #333; padding-top: 3px;">
+                <span><strong>TOTAL:</strong></span>
+                <span><strong>$${saleData.total.toLocaleString('es-CO')}</strong></span>
+            </div>
+        </div>
+        
+        <div class="ticket-footer">
+            <div>¡GRACIAS POR SU COMPRA!</div>
+            <div>Vuelva pronto</div>
+            <div>@cafenarebalneario</div>
+            <div>================================</div>
+        </div>
+    `;
+    
+    return ticketHTML;
+}
+
+function showTicket(saleData, customerData = null) {
+    const ticketModal = document.getElementById('ticketModal');
+    const ticketContent = document.getElementById('ticketContent');
+    
+    ticketContent.innerHTML = generateTicket(saleData, customerData);
+    ticketModal.style.display = 'block';
+}
+
+function printTicket() {
+    window.print();
+}
+
+function closeTicketModal() {
+    document.getElementById('ticketModal').style.display = 'none';
+}
+
+// Initialize ticket modal events
+document.addEventListener('DOMContentLoaded', function() {
+    const ticketModal = document.getElementById('ticketModal');
+    const closeBtn = document.getElementById('closeTicket');
+    
+    if (closeBtn) {
+        closeBtn.onclick = closeTicketModal;
+    }
+    
+    if (ticketModal) {
+        window.onclick = function(event) {
+            if (event.target == ticketModal) {
+                closeTicketModal();
+            }
+        }
+    }
+});

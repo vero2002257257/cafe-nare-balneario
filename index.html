@@ -423,6 +423,24 @@
     <!-- Toast Notifications -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Ticket Modal for Printing -->
+    <div id="ticketModal" class="modal">
+        <div class="modal-content ticket-modal">
+            <span class="close" id="closeTicket">&times;</span>
+            <div id="ticketContent" class="ticket-content">
+                <!-- Ticket content will be generated here -->
+            </div>
+            <div class="ticket-actions">
+                <button onclick="printTicket()" class="btn-print">
+                    <i class="fas fa-print"></i> Imprimir Ticket
+                </button>
+                <button onclick="closeTicketModal()" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
