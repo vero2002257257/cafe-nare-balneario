@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Café Nare Balneario - Gestión</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-coffee"></i>
+                <span>Café Nare</span>
+            </div>
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-coffee"></i>
+            <span>Café Nare</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#dashboard" class="menu-item active" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a></li>
+            <li><a href="#products" class="menu-item" data-section="products">
+                <i class="fas fa-box"></i>
+                <span>Productos</span>
+            </a></li>
+            <li><a href="#inventory" class="menu-item" data-section="inventory">
+                <i class="fas fa-warehouse"></i>
+                <span>Inventario</span>
+            </a></li>
+            <li><a href="#sales" class="menu-item" data-section="sales">
+                <i class="fas fa-cash-register"></i>
+                <span>Ventas</span>
+            </a></li>
+            <li><a href="#customers" class="menu-item" data-section="customers">
+                <i class="fas fa-users"></i>
+                <span>Clientes</span>
+            </a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="section-header">
+                <h1>Dashboard</h1>
+                <div class="date-time" id="currentDateTime"></div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card sales-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Ventas Hoy</h3>
+                        <p class="stat-value" id="todaySales">$0</p>
+                        <span class="stat-change positive">+12%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card products-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Productos</h3>
+                        <p class="stat-value" id="totalProducts">0</p>
+                        <span class="stat-change">Total activos</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card inventory-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Stock Bajo</h3>
+                        <p class="stat-value" id="lowStockItems">0</p>
+                        <span class="stat-change warning">Productos</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card customers-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Clientes</h3>
+                        <p class="stat-value" id="totalCustomers">0</p>
+                        <span class="stat-change">Registrados</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="recent-sales">
+                    <h2>Ventas Recientes</h2>
+                    <div class="sales-list" id="recentSalesList">
+                        <!-- Sales will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="low-stock-alert">
+                    <h2>Alertas de Stock</h2>
+                    <div class="stock-alerts" id="stockAlerts">
+                        <!-- Low stock items will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="section">
+            <div class="section-header">
+                <h1>Gestión de Productos</h1>
+                <button class="btn-primary" id="addProductBtn">
+                    <i class="fas fa-plus"></i>
+                    Nuevo Producto
+                </button>
+            </div>
+            
+            <div class="filters">
+                <input type="text" placeholder="Buscar productos..." id="productSearch" class="search-input">
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">Todas las categorías</option>
+                    <option value="bebidas-calientes">Bebidas Calientes</option>
+                    <option value="bebidas-frias">Bebidas Frías</option>
+                    <option value="postres">Postres</option>
+                    <option value="snacks">Snacks</option>
+                    <option value="otros">Otros</option>
+                </select>
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="grid" id="gridView">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="view-btn" data-view="list" id="listView">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="products-container">
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Inventory Section -->
+        <section id="inventory" class="section">
+            <div class="section-header">
+                <h1>Inventario</h1>
+                <button class="btn-primary" id="updateStockBtn">
+                    <i class="fas fa-sync"></i>
+                    Actualizar Stock
+                </button>
+            </div>
+            
+            <div class="inventory-table-container">
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Stock Actual</th>
+                            <th>Stock Mínimo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <!-- Inventory items will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sales Section -->
+        <section id="sales" class="section">
+            <div class="section-header">
+                <h1>Ventas</h1>
+                <button class="btn-primary" id="newSaleBtn">
+                    <i class="fas fa-plus"></i>
+                    Nueva Venta
+                </button>
+            </div>
+            
+            <div class="sales-content">
+                <div class="sale-form-container" id="saleFormContainer" style="display: none;">
+                    <div class="sale-form">
+                        <h3>Nueva Venta</h3>
+                        <div class="customer-selection">
+                            <label>Cliente:</label>
+                            <select id="customerSelect">
+                                <option value="">Cliente general</option>
+                            </select>
+                        </div>
+                        
+                        <div class="product-selection">
+                            <label>Añadir productos:</label>
+                            <div class="product-search">
+                                <input type="text" placeholder="Buscar producto..." id="saleProductSearch">
+                                <div class="product-suggestions" id="productSuggestions"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="sale-items" id="saleItems">
+                            <!-- Sale items will be added here -->
+                        </div>
+                        
+                        <div class="sale-total">
+                            <strong>Total: $<span id="saleTotal">0.00</span></strong>
+                        </div>
+                        
+                        <div class="sale-actions">
+                            <button class="btn-secondary" id="cancelSaleBtn">Cancelar</button>
+                            <button class="btn-primary" id="completeSaleBtn">Completar Venta</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sales-history">
+                    <h3>Historial de Ventas</h3>
+                    <div class="sales-table-container">
+                        <table class="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Productos</th>
+                                    <th>Total</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesTableBody">
+                                <!-- Sales history will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customers Section -->
+        <section id="customers" class="section">
+            <div class="section-header">
+                <h1>Clientes</h1>
+                <button class="btn-primary" id="addCustomerBtn">
+                    <i class="fas fa-plus"></i>
+                    Nuevo Cliente
+                </button>
+            </div>
+            
+            <div class="customers-grid" id="customersGrid">
+                <!-- Customers will be populated here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="productModalTitle">Nuevo Producto</h2>
+                <button class="close-btn" id="closeProductModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productName">Nombre del Producto *</label>
+                    <input type="text" id="productName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productDescription">Descripción</label>
+                    <textarea id="productDescription" rows="3"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productCategory">Categoría *</label>
+                        <select id="productCategory" required>
+                            <option value="">Seleccionar categoría</option>
+                            <option value="bebidas-calientes">Bebidas Calientes</option>
+                            <option value="bebidas-frias">Bebidas Frías</option>
+                            <option value="postres">Postres</option>
+                            <option value="snacks">Snacks</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productPrice">Precio ($) *</label>
+                        <input type="number" id="productPrice" step="0.01" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productStock">Stock Inicial *</label>
+                        <input type="number" id="productStock" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productMinStock">Stock Mínimo</label>
+                        <input type="number" id="productMinStock" min="0" value="5">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productImage">Imagen del Producto</label>
+                    <input type="file" id="productImage" accept="image/*">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelProductBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customer Modal -->
+    <div class="modal" id="customerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="customerModalTitle">Nuevo Cliente</h2>
+                <button class="close-btn" id="closeCustomerModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="customerForm">
+                <div class="form-group">
+                    <label for="customerName">Nombre Completo *</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerEmail">Email</label>
+                    <input type="email" id="customerEmail">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerPhone">Teléfono</label>
+                    <input type="tel" id="customerPhone">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelCustomerBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stock Update Modal -->
+    <div class="modal" id="stockModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Actualizar Stock</h2>
+                <button class="close-btn" id="closeStockModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="stockForm">
+                <div class="form-group">
+                    <label for="stockProduct">Producto</label>
+                    <input type="text" id="stockProduct" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stockCurrent">Stock Actual</label>
+                    <input type="number" id="stockCurrent" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stockNew">Nuevo Stock *</label>
+                    <input type="number" id="stockNew" min="0" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelStockBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary">Actualizar Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading" id="loadingSpinner" style="display: none;">
+        <div class="spinner"></div>
+        <p>Cargando...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+============================================================
+☕ CAFÉ NARE BALNEARIO - INSTALACIÓN PASO A PASO
+============================================================
+
+🚀 INSTALACIÓN RÁPIDA (3 PASOS):
+
+1️⃣ INSTALAR DEPENDENCIAS:
+   Abrir terminal en esta carpeta y ejecutar:
+   npm install
+
+2️⃣ INICIAR APLICACIÓN:
+   npm start
+
+3️⃣ ABRIR EN NAVEGADOR:
+   http://localhost:3000
+
+¡LISTO! Ya tienes tu sistema funcionando.
+
+============================================================
+
+📁 ESTRUCTURA DE ARCHIVOS CREADA:
+
+✅ index.html          - Aplicación web principal
+✅ styles.css           - Estilos del tema café
+✅ script.js            - Funcionalidad JavaScript
+✅ server.js            - Servidor Node.js
+✅ package.json         - Dependencias del proyecto
+
+📁 Carpetas:
+✅ data/                - Base de datos Excel
+✅ data/backups/        - Copias de seguridad
+✅ uploads/             - Imágenes de productos
+✅ config/              - Configuración de Google Sheets
+✅ handlers/            - Manejadores de datos
+✅ scripts/             - Scripts de utilidad
+
+============================================================
+
+🎯 CARACTERÍSTICAS INCLUIDAS:
+
+✅ Interfaz móvil-friendly
+✅ Tema café profesional (colores cálidos)
+✅ Gestión de productos con imágenes
+✅ Control de inventario con alertas
+✅ Sistema de ventas intuitivo
+✅ Gestión de clientes
+✅ Dashboard con estadísticas
+✅ Base de datos Excel automática
+✅ Integración opcional con Google Sheets
+✅ Sistema de backups
+✅ Diseño responsive
+
+============================================================
+
+📊 DATOS DE EJEMPLO INCLUIDOS:
+
+Productos:
+- ☕ Café Americano ($3,500)
+- ☕ Cappuccino ($4,500)
+- 🥐 Croissant ($2,500)
+- 🧃 Jugo de Naranja ($3,000)
+
+Clientes:
+- María García (15 compras)
+- Juan Pérez (8 compras)
+
+============================================================
+
+🔧 COMANDOS ÚTILES:
+
+npm start              - Iniciar aplicación
+npm run dev            - Modo desarrollo
+node scripts/backup.js - Crear backup
+node scripts/cleanup.js - Limpiar archivos
+
+============================================================
+
+📱 USO EN MÓVIL:
+
+- Responsive design que se adapta a cualquier pantalla
+- Menú hamburguesa para navegación fácil
+- Botones grandes para uso táctil
+- Funciona en tablets y smartphones
+
+============================================================
+
+🔄 CONFIGURACIÓN AVANZADA (OPCIONAL):
+
+Para usar Google Sheets en lugar de Excel:
+
+1. Copiar env.example a .env
+2. Cambiar USE_GOOGLE_SHEETS=true
+3. Obtener credenciales de Google Cloud
+4. Ejecutar: node scripts/setup-google-auth.js
+
+Ver README.md para instrucciones detalladas.
+
+============================================================
+
+❓ SOLUCIÓN DE PROBLEMAS:
+
+Error "Puerto en uso":
+- Windows: netstat -ano | findstr :3000
+- Mac/Linux: lsof -ti:3000 | xargs kill -9
+
+No abre la aplicación:
+1. Verificar que Node.js esté instalado
+2. Ejecutar "npm install" primero
+3. Abrir http://localhost:3000
+
+============================================================
+
+📞 INFORMACIÓN:
+
+- Desarrollado para Café Nare Balneario
+- Tecnología: Node.js, Express, HTML5, CSS3
+- Base de datos: Excel/Google Sheets
+- Licencia: MIT
+
+¡Disfruta tu nuevo sistema de gestión! ☕✨
+
+============================================================

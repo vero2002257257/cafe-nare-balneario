@@ -1,0 +1,30 @@
+{
+  "name": "cafe-nare-balneario",
+  "version": "1.0.0",
+  "description": "Aplicación web para gestión de café - productos, inventario, ventas y clientes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "heroku-postbuild": "echo 'Build completed successfully'"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "multer": "^1.4.5-lts.1",
+    "xlsx": "^0.18.5",
+    "googleapis": "^128.0.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["cafe", "inventory", "sales", "management"],
+  "author": "Cafe Nare Balneario",
+  "license": "MIT"
+}
