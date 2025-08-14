@@ -444,18 +444,55 @@ app.get('/api/reports/sales', async (req, res) => {
 // Export data routes
 app.get('/api/export/excel', async (req, res) => {
     try {
-        const filePath = await dataHandler.exportToExcel();
-        res.download(filePath, 'cafe_data_export.xlsx', (err) => {
-            if (err) {
-                console.error('Error downloading file:', err);
-                res.status(500).json({ error: 'Error al descargar archivo' });
-            }
-            // Clean up temporary file
-            fs.unlink(filePath, () => {});
-        });
+        console.log('Export Excel requested');
+        
+        // Get all data
+        const [products, customers, sales] = await Promise.all([
+            dataHandler.getProducts(),
+            dataHandler.getCustomers(),
+            dataHandler.getSales()
+        ]);
+
+        // Create workbook
+        const XLSX = require('xlsx');
+        const workbook = XLSX.utils.book_new();
+
+        // Create worksheets
+        const productsWS = XLSX.utils.json_to_sheet(products);
+        const customersWS = XLSX.utils.json_to_sheet(customers);
+        
+        // Flatten sales data for Excel
+        const salesFlat = sales.map(sale => ({
+            id: sale.id,
+            date: sale.date,
+            customerId: sale.customerId,
+            customerName: sale.customerName,
+            total: sale.total,
+            items: sale.items.map(item => `${item.productName} (${item.quantity})`).join(', ')
+        }));
+        const salesWS = XLSX.utils.json_to_sheet(salesFlat);
+
+        // Add worksheets to workbook
+        XLSX.utils.book_append_sheet(workbook, productsWS, 'Productos');
+        XLSX.utils.book_append_sheet(workbook, customersWS, 'Clientes');
+        XLSX.utils.book_append_sheet(workbook, salesWS, 'Ventas');
+
+        // Generate buffer
+        const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+        // Set headers
+        const filename = `cafe_data_${new Date().toISOString().split('T')[0]}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Length', buffer.length);
+
+        // Send buffer
+        res.send(buffer);
+        
+        console.log('Excel export completed successfully');
     } catch (error) {
         console.error('Error exporting to Excel:', error);
-        res.status(500).json({ error: 'Error al exportar a Excel' });
+        res.status(500).json({ error: 'Error al exportar a Excel: ' + error.message });
     }
 });
 

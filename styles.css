@@ -165,6 +165,10 @@ body {
     color: white;
 }
 
+.admin-only {
+    display: none !important;
+}
+
 .admin-mode .admin-only {
     display: block !important;
 }
