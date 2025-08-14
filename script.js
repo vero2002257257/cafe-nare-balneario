@@ -1341,6 +1341,116 @@ function printTicket() {
     window.print();
 }
 
+function printTicketPreview() {
+    // Create a new window with the ticket content for testing
+    const ticketContent = document.getElementById('ticketContent').innerHTML;
+    const newWindow = window.open('', '_blank', 'width=400,height=600');
+    
+    newWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Ticket - Café Nare Balneario</title>
+            <style>
+                body {
+                    margin: 0;
+                    padding: 20px;
+                    font-family: 'Courier New', monospace;
+                    background-color: #f5f5f5;
+                }
+                .ticket-preview {
+                    background: white;
+                    padding: 15px;
+                    border: 2px dashed #8B4513;
+                    max-width: 300px;
+                    margin: 0 auto;
+                    line-height: 1.4;
+                    font-size: 12px;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                }
+                .ticket-header {
+                    text-align: center;
+                    border-bottom: 1px dashed #8B4513;
+                    padding-bottom: 10px;
+                    margin-bottom: 10px;
+                }
+                .ticket-title {
+                    font-weight: bold;
+                    font-size: 14px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+                .ticket-info {
+                    margin: 10px 0;
+                    font-size: 11px;
+                }
+                .ticket-items {
+                    border-top: 1px dashed #8B4513;
+                    border-bottom: 1px dashed #8B4513;
+                    padding: 10px 0;
+                    margin: 10px 0;
+                }
+                .ticket-item {
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 3px 0;
+                    font-size: 11px;
+                }
+                .ticket-total {
+                    text-align: right;
+                    font-weight: bold;
+                    font-size: 13px;
+                    margin-top: 10px;
+                    border-top: 1px dashed #8B4513;
+                    padding-top: 5px;
+                }
+                .ticket-footer {
+                    text-align: center;
+                    margin-top: 15px;
+                    font-size: 10px;
+                    border-top: 1px dashed #8B4513;
+                    padding-top: 10px;
+                }
+                .print-button {
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                .btn {
+                    background-color: #8B4513;
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    margin: 0 5px;
+                }
+                .btn:hover {
+                    background-color: #A0522D;
+                }
+                .btn-secondary {
+                    background-color: #6c757d;
+                }
+                .btn-secondary:hover {
+                    background-color: #5a6268;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="ticket-preview">
+                ${ticketContent}
+            </div>
+            <div class="print-button">
+                <button class="btn" onclick="window.print()">🖨️ Imprimir Real</button>
+                <button class="btn btn-secondary" onclick="window.close()">❌ Cerrar</button>
+            </div>
+        </body>
+        </html>
+    `);
+    
+    newWindow.document.close();
+}
+
 function closeTicketModal() {
     document.getElementById('ticketModal').style.display = 'none';
 }
