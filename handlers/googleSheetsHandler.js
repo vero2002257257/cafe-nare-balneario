@@ -45,7 +45,15 @@ class GoogleSheetsHandler {
 
     async authenticate() {
         try {
-            const credentials = JSON.parse(fs.readFileSync(this.credentialsPath));
+            let credentials;
+            
+            // Try to read from environment variable first (for production)
+            if (process.env.GOOGLE_CREDENTIALS) {
+                credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+            } else {
+                // Fallback to file (for local development)
+                credentials = JSON.parse(fs.readFileSync(this.credentialsPath));
+            }
             
             // Use Service Account authentication
             this.auth = new google.auth.GoogleAuth({
