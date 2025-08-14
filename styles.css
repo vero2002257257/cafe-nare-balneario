@@ -285,35 +285,40 @@ body {
     
     .ticket-content {
         position: absolute;
-        left: 20px;
-        top: 20px;
-        width: 150mm; /* Wider for regular printers - testing */
-        font-size: 14px; /* Larger font for testing */
+        left: 0;
+        top: 0;
+        width: 58mm; /* Standard thermal printer width */
+        font-size: 9px; /* Optimized for thermal */
         margin: 0;
-        padding: 10px;
-        border: 2px solid #333;
+        padding: 2mm;
+        border: none;
         background: white;
-        max-width: none;
+        line-height: 1.2;
     }
     
     .ticket-title {
-        font-size: 18px !important;
+        font-size: 11px !important;
         font-weight: bold;
+        text-align: center;
     }
     
     .ticket-info {
-        font-size: 12px !important;
-        margin: 8px 0 !important;
+        font-size: 8px !important;
+        margin: 2px 0 !important;
     }
     
     .ticket-item {
-        font-size: 12px !important;
-        margin: 5px 0 !important;
+        font-size: 8px !important;
+        margin: 1px 0 !important;
     }
     
     .ticket-total {
-        font-size: 14px !important;
+        font-size: 9px !important;
         font-weight: bold;
+    }
+    
+    .ticket-header, .ticket-items, .ticket-total, .ticket-footer {
+        page-break-inside: avoid;
     }
     
     .modal, .ticket-actions {
