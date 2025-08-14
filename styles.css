@@ -285,13 +285,35 @@ body {
     
     .ticket-content {
         position: absolute;
-        left: 0;
-        top: 0;
-        width: 58mm; /* Standard thermal printer width */
-        font-size: 10px;
+        left: 20px;
+        top: 20px;
+        width: 150mm; /* Wider for regular printers - testing */
+        font-size: 14px; /* Larger font for testing */
         margin: 0;
-        padding: 5px;
-        border: none;
+        padding: 10px;
+        border: 2px solid #333;
+        background: white;
+        max-width: none;
+    }
+    
+    .ticket-title {
+        font-size: 18px !important;
+        font-weight: bold;
+    }
+    
+    .ticket-info {
+        font-size: 12px !important;
+        margin: 8px 0 !important;
+    }
+    
+    .ticket-item {
+        font-size: 12px !important;
+        margin: 5px 0 !important;
+    }
+    
+    .ticket-total {
+        font-size: 14px !important;
+        font-weight: bold;
     }
     
     .modal, .ticket-actions {
