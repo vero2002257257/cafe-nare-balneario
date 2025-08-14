@@ -11,8 +11,8 @@ let currentSale = {
 let isAdminMode = false;
 const ADMIN_PASSWORD = 'CAFE2024'; // Cambiar por una contraseña más segura
 
-// API Base URL
-const API_BASE = 'http://localhost:3000/api';
+// API Base URL - works both locally and on Railway
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 
 // DOM Elements
 const sidebar = document.getElementById('sidebar');
