@@ -4,24 +4,21 @@ const path = require('path');
 
 class GoogleSheetsHandler {
     constructor() {
-        this.credentialsPath = './config/google-credentials.json';
-        this.tokenPath = './config/google-token.json';
-        this.spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
+        this.credentialsPath = process.env.GOOGLE_CREDENTIALS_PATH || './google-credentials.json';
+        this.spreadsheetId = process.env.GOOGLE_SHEETS_ID;
         this.auth = null;
         this.sheets = null;
         
         this.sheetNames = {
             products: 'Productos',
             customers: 'Clientes', 
-            sales: 'Ventas',
-            saleItems: 'DetalleVentas'
+            sales: 'Ventas'
         };
         
         this.ranges = {
-            products: 'Productos!A:J',
-            customers: 'Clientes!A:I',
-            sales: 'Ventas!A:F',
-            saleItems: 'DetalleVentas!A:G'
+            products: 'Productos!A:F',
+            customers: 'Clientes!A:E',
+            sales: 'Ventas!A:F'
         };
     }
 
@@ -29,11 +26,11 @@ class GoogleSheetsHandler {
         try {
             // Check if Google Sheets is properly configured
             if (!this.spreadsheetId) {
-                throw new Error('GOOGLE_SPREADSHEET_ID environment variable not set');
+                throw new Error('GOOGLE_SHEETS_ID environment variable not set');
             }
 
             if (!fs.existsSync(this.credentialsPath)) {
-                throw new Error('Google credentials file not found. Please add google-credentials.json to config folder');
+                throw new Error('Google credentials file not found. Please add google-credentials.json to project root');
             }
 
             await this.authenticate();
@@ -49,20 +46,13 @@ class GoogleSheetsHandler {
     async authenticate() {
         try {
             const credentials = JSON.parse(fs.readFileSync(this.credentialsPath));
-            const { client_secret, client_id, redirect_uris } = credentials.web || credentials.installed;
             
-            const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+            // Use Service Account authentication
+            this.auth = new google.auth.GoogleAuth({
+                credentials: credentials,
+                scopes: ['https://www.googleapis.com/auth/spreadsheets']
+            });
             
-            // Load existing token
-            if (fs.existsSync(this.tokenPath)) {
-                const token = JSON.parse(fs.readFileSync(this.tokenPath));
-                oAuth2Client.setCredentials(token);
-            } else {
-                // Need to generate token - this would typically be done in a setup script
-                throw new Error('Google token not found. Please run the setup script to authenticate.');
-            }
-            
-            this.auth = oAuth2Client;
             this.sheets = google.sheets({ version: 'v4', auth: this.auth });
             
         } catch (error) {
@@ -95,10 +85,9 @@ class GoogleSheetsHandler {
 
     getSheetHeaders(sheetType) {
         const headers = {
-            products: ['id', 'name', 'description', 'category', 'price', 'stock', 'minStock', 'image', 'createdAt', 'updatedAt'],
-            customers: ['id', 'name', 'email', 'phone', 'totalPurchases', 'totalSpent', 'lastPurchase', 'createdAt', 'updatedAt'],
-            sales: ['id', 'customerId', 'customerName', 'total', 'date', 'createdAt'],
-            saleItems: ['id', 'saleId', 'productId', 'productName', 'quantity', 'price', 'subtotal']
+            products: ['id', 'nombre', 'categoria', 'precio', 'stock', 'descripcion'],
+            customers: ['id', 'nombre', 'telefono', 'email', 'fechaRegistro'],
+            sales: ['id', 'fecha', 'clienteId', 'productos', 'total', 'vendedor']
         };
         
         return headers[sheetType] || [];
@@ -360,12 +349,24 @@ class GoogleSheetsHandler {
     async getSales() {
         try {
             const sales = await this.readSheet(this.ranges.sales);
-            const saleItems = await this.readSheet(this.ranges.saleItems);
             
-            // Combine sales with their items
+            // Parse the productos field back to items array
             const salesWithItems = sales.map(sale => {
-                const items = saleItems.filter(item => item.saleId === sale.id);
-                return { ...sale, items };
+                let items = [];
+                try {
+                    items = JSON.parse(sale.productos || '[]');
+                } catch (e) {
+                    items = [];
+                }
+                return { 
+                    id: sale.id,
+                    customerId: sale.clienteId,
+                    customerName: sale.clienteId || 'Cliente General',
+                    total: parseFloat(sale.total) || 0,
+                    date: sale.fecha,
+                    items: items,
+                    vendedor: sale.vendedor || 'Sistema'
+                };
             });
             
             return salesWithItems;
@@ -377,32 +378,18 @@ class GoogleSheetsHandler {
 
     async addSale(saleData) {
         try {
-            // Add sale to sales sheet
+            // Convert sale data to match sheet headers
             const saleRecord = {
                 id: saleData.id,
-                customerId: saleData.customerId,
-                customerName: saleData.customerName,
+                fecha: saleData.date,
+                clienteId: saleData.customerId || '',
+                productos: JSON.stringify(saleData.items),
                 total: saleData.total,
-                date: saleData.date,
-                createdAt: saleData.createdAt
+                vendedor: 'Sistema'
             };
             
             const salesHeaders = this.getSheetHeaders('sales');
             await this.appendToSheet(this.ranges.sales, [saleRecord], salesHeaders);
-            
-            // Add sale items to sale items sheet
-            const newSaleItems = saleData.items.map(item => ({
-                id: `${saleData.id}_${item.productId}`,
-                saleId: saleData.id,
-                productId: item.productId,
-                productName: item.productName,
-                quantity: item.quantity,
-                price: item.price,
-                subtotal: item.price * item.quantity
-            }));
-            
-            const saleItemsHeaders = this.getSheetHeaders('saleItems');
-            await this.appendToSheet(this.ranges.saleItems, newSaleItems, saleItemsHeaders);
             
             return saleData;
         } catch (error) {
