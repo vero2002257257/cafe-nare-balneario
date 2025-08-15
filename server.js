@@ -500,6 +500,140 @@ app.get('/api/export/excel', async (req, res) => {
     }
 });
 
+// Loyverse API - Create Item (crear producto)
+app.post('/api/loyverse/create-item', async (req, res) => {
+    try {
+        const { accessToken, storeId } = req.body;
+        
+        if (!accessToken || !storeId) {
+            return res.status(400).json({ error: 'Access token y Store ID requeridos' });
+        }
+        
+        // Crear producto genérico para ventas
+        const genericItem = {
+            item_name: "Producto Genérico - Café Nare",
+            category_name: "Bebidas",
+            variants: [{
+                variant_name: "Genérico",
+                default_price: 1000, // $10 pesos por defecto en centavos
+                sku: "GENERIC-001",
+                track_stock: false, // No rastrear inventario
+                stores: [storeId] // Stores va dentro de variants
+            }]
+        };
+        
+        console.log('Creando producto genérico en Loyverse...');
+        
+        const response = await fetch('https://api.loyverse.com/v1.0/items', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(genericItem)
+        });
+        
+        const responseText = await response.text();
+        console.log('Respuesta crear item:', response.status, responseText);
+        
+        if (response.ok) {
+            const result = JSON.parse(responseText);
+            res.json(result);
+        } else {
+            res.status(response.status).json({ 
+                error: `Error creando item: ${response.status}`,
+                details: responseText
+            });
+        }
+    } catch (error) {
+        console.error('Error creando item:', error);
+        res.status(500).json({ 
+            error: 'Error interno',
+            details: error.message 
+        });
+    }
+});
+
+// Loyverse API - Get Items (productos)
+app.post('/api/loyverse/items', async (req, res) => {
+    try {
+        const { accessToken } = req.body;
+        
+        if (!accessToken) {
+            return res.status(400).json({ error: 'Access token requerido' });
+        }
+        
+        console.log('Obteniendo items de Loyverse...');
+        
+        const response = await fetch('https://api.loyverse.com/v1.0/items', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const responseText = await response.text();
+        console.log('Respuesta items:', response.status, responseText);
+        
+        if (response.ok) {
+            const result = JSON.parse(responseText);
+            res.json(result);
+        } else {
+            res.status(response.status).json({ 
+                error: `Error obteniendo items: ${response.status}`,
+                details: responseText
+            });
+        }
+    } catch (error) {
+        console.error('Error obteniendo items:', error);
+        res.status(500).json({ 
+            error: 'Error interno',
+            details: error.message 
+        });
+    }
+});
+
+// Loyverse API - Get Payment Types
+app.post('/api/loyverse/payment-types', async (req, res) => {
+    try {
+        const { accessToken } = req.body;
+        
+        if (!accessToken) {
+            return res.status(400).json({ error: 'Access token requerido' });
+        }
+        
+        console.log('Obteniendo payment types de Loyverse...');
+        
+        const response = await fetch('https://api.loyverse.com/v1.0/payment_types', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const responseText = await response.text();
+        console.log('Respuesta payment types:', response.status, responseText);
+        
+        if (response.ok) {
+            const result = JSON.parse(responseText);
+            res.json(result);
+        } else {
+            res.status(response.status).json({ 
+                error: `Error obteniendo payment types: ${response.status}`,
+                details: responseText
+            });
+        }
+    } catch (error) {
+        console.error('Error obteniendo payment types:', error);
+        res.status(500).json({ 
+            error: 'Error interno',
+            details: error.message 
+        });
+    }
+});
+
 // Loyverse API - Get Stores (para obtener store_id)
 app.post('/api/loyverse/stores', async (req, res) => {
     try {
@@ -561,15 +695,14 @@ app.post('/api/loyverse/receipt', async (req, res) => {
             line_items: saleData.items.map((item, index) => ({
                 quantity: item.quantity,
                 item_name: item.productName,
-                // Generar UUID válido para variant_id (requerido por Loyverse)
-                variant_id: uuidv4(),
+                variant_id: "29bfb42b-d316-40e0-aa9e-cca13b09298c", // UUID real del producto creado
                 cost: Math.round(item.price * 100), // Loyverse usa centavos
                 price: Math.round(item.price * 100),
                 line_note: item.description || '',
                 taxes: [] // Sin impuestos por ahora
             })),
             payments: [{
-                payment_type_id: null, // Para efectivo
+                payment_type_id: 'b5e48c2c-aa02-4bea-9b85-d4ccc344d194', // UUID real para efectivo
                 amount: Math.round(saleData.total * 100) // En centavos
             }],
             note: `Venta desde Café Nare - ${new Date().toLocaleString('es-CO')}`,
