@@ -536,7 +536,10 @@ app.post('/api/loyverse/receipt', async (req, res) => {
             source: 'API'
         };
         
-        console.log('Enviando a Loyverse:', JSON.stringify(loyverseOrder, null, 2));
+        console.log('=== ENVIANDO A LOYVERSE ===');
+        console.log('AccessToken (primeros 10 chars):', accessToken.substring(0, 10) + '...');
+        console.log('StoreId:', storeId);
+        console.log('Datos enviados:', JSON.stringify(loyverseOrder, null, 2));
         
         const response = await fetch('https://api.loyverse.com/v1.0/receipts', {
             method: 'POST',
@@ -548,7 +551,10 @@ app.post('/api/loyverse/receipt', async (req, res) => {
         });
         
         const responseText = await response.text();
-        console.log('Respuesta de Loyverse:', response.status, responseText);
+        console.log('=== RESPUESTA DE LOYVERSE ===');
+        console.log('Status:', response.status);
+        console.log('Headers:', Object.fromEntries(response.headers.entries()));
+        console.log('Body:', responseText);
         
         if (response.ok) {
             const result = JSON.parse(responseText);
