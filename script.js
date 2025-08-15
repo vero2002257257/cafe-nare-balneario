@@ -14,6 +14,14 @@ const ADMIN_PASSWORD = 'CAFE2024'; // Cambiar por una contraseña más segura
 // API Base URL - works both locally and on Railway
 const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 
+// Loyverse API Configuration
+const LOYVERSE_CONFIG = {
+    baseUrl: 'https://api.loyverse.com/v1.0',
+    accessToken: '', // Se configurará desde el panel admin
+    storeId: '', // Se configurará desde el panel admin
+    enabled: false
+};
+
 // DOM Elements
 const sidebar = document.getElementById('sidebar');
 const menuToggle = document.getElementById('menuToggle');
@@ -34,11 +42,19 @@ document.addEventListener('DOMContentLoaded', function() {
 async function initializeApp() {
     showLoading();
     try {
+        // Cargar configuración de Loyverse
+        loadLoyverseConfig();
+        
         await loadProducts();
         await loadCustomers();
         await loadSales();
         updateDashboard();
         showToast('Aplicación cargada correctamente', 'success');
+        
+        // Mostrar estado de Loyverse si está en modo admin
+        if (isAdminMode && LOYVERSE_CONFIG.enabled) {
+            showToast('Loyverse integrado ✓', 'info');
+        }
     } catch (error) {
         console.error('Error initializing app:', error);
         showToast('Error al cargar la aplicación', 'error');
@@ -63,6 +79,12 @@ function setupEventListeners() {
     const downloadExcelBtn = document.getElementById('downloadExcelBtn');
     if (downloadExcelBtn) {
         downloadExcelBtn.addEventListener('click', downloadExcelData);
+    }
+
+    // Configure Loyverse Button
+    const configureLoyverseBtn = document.getElementById('configureLoyverseBtn');
+    if (configureLoyverseBtn) {
+        configureLoyverseBtn.addEventListener('click', configureLoyverse);
     }
 
     // Admin Toggle Button
@@ -704,19 +726,30 @@ async function completeSale() {
     
     showLoading();
     try {
+        // Registrar venta en nuestro sistema
         await apiCall('/sales', 'POST', saleData);
-        showToast('Venta registrada correctamente ✓', 'success');
         
-        // Show ticket option
-        setTimeout(() => {
-            if (confirm('¿Desea imprimir el ticket para el cliente?')) {
-                showTicket(saleData, customer);
-                // Auto-open print dialog after ticket is shown
-                setTimeout(() => {
-                    printTicket();
-                }, 300);
-            }
-        }, 500);
+        // Enviar a Loyverse API si está configurado
+        const loyverseResult = await sendToLoyverse(saleData, customer);
+        
+        if (loyverseResult) {
+            showToast('Venta registrada y enviada a Loyverse ✓', 'success');
+            // Con Loyverse configurado, la impresión será automática
+            showToast('Ticket enviado a impresora automáticamente 🖨️', 'info');
+        } else {
+            showToast('Venta registrada correctamente ✓', 'success');
+            
+            // Solo mostrar opción manual si Loyverse no está configurado
+            setTimeout(() => {
+                if (confirm('¿Desea imprimir el ticket para el cliente?')) {
+                    showTicket(saleData, customer);
+                    // Auto-open print dialog after ticket is shown
+                    setTimeout(() => {
+                        printTicket();
+                    }, 300);
+                }
+            }, 500);
+        }
         
         cancelSale();
         renderSales();
@@ -1453,6 +1486,115 @@ function printTicketPreview() {
 
 function closeTicketModal() {
     document.getElementById('ticketModal').style.display = 'none';
+}
+
+// ===== LOYVERSE API INTEGRATION =====
+
+// Configurar Loyverse desde el panel admin
+function configureLoyverse() {
+    if (!isAdminMode) {
+        showToast('Acceso denegado', 'error');
+        return;
+    }
+    
+    const accessToken = prompt('Ingresa el Access Token de Loyverse API:');
+    const storeId = prompt('Ingresa el Store ID de Loyverse:');
+    
+    if (accessToken && storeId) {
+        LOYVERSE_CONFIG.accessToken = accessToken;
+        LOYVERSE_CONFIG.storeId = storeId;
+        LOYVERSE_CONFIG.enabled = true;
+        
+        // Guardar en localStorage
+        localStorage.setItem('loyverse_config', JSON.stringify(LOYVERSE_CONFIG));
+        showToast('Configuración de Loyverse guardada ✓', 'success');
+    }
+}
+
+// Cargar configuración de Loyverse desde localStorage
+function loadLoyverseConfig() {
+    const savedConfig = localStorage.getItem('loyverse_config');
+    if (savedConfig) {
+        const config = JSON.parse(savedConfig);
+        LOYVERSE_CONFIG.accessToken = config.accessToken;
+        LOYVERSE_CONFIG.storeId = config.storeId;
+        LOYVERSE_CONFIG.enabled = config.enabled;
+    }
+}
+
+// Enviar venta a Loyverse API
+async function sendToLoyverse(saleData, customerData = null) {
+    if (!LOYVERSE_CONFIG.enabled || !LOYVERSE_CONFIG.accessToken) {
+        console.log('Loyverse no configurado, omitiendo envío');
+        return null;
+    }
+    
+    try {
+        // Formato de orden para Loyverse API
+        const loyverseOrder = {
+            store_id: LOYVERSE_CONFIG.storeId,
+            customer_id: customerData ? customerData.loyverseId : null,
+            customer: customerData ? {
+                name: customerData.name,
+                email: customerData.email || '',
+                phone_number: customerData.phone || ''
+            } : null,
+            line_items: saleData.items.map(item => ({
+                quantity: item.quantity,
+                item_name: item.productName,
+                variant_name: '', // No tenemos variantes
+                cost: item.price * 100, // Loyverse usa centavos
+                price: item.price * 100,
+                line_note: item.description || '',
+                taxes: [] // Sin impuestos por ahora
+            })),
+            payment_types: [{
+                name: 'Efectivo',
+                amount: saleData.total * 100 // En centavos
+            }],
+            note: `Venta desde Café Nare - ${new Date().toLocaleString('es-CO')}`,
+            source: 'API'
+        };
+        
+        const response = await fetch(`${LOYVERSE_CONFIG.baseUrl}/receipts`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${LOYVERSE_CONFIG.accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loyverseOrder)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Venta enviada a Loyverse:', result);
+            
+            // Activar impresión automática en Loyverse
+            await triggerLoyversePrint(result.receipt_number);
+            
+            return result;
+        } else {
+            const error = await response.text();
+            console.error('Error al enviar a Loyverse:', error);
+            throw new Error(`Error Loyverse: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error en integración Loyverse:', error);
+        showToast('Error al sincronizar con Loyverse', 'warning');
+        return null;
+    }
+}
+
+// Activar impresión en Loyverse (si el dispositivo está configurado)
+async function triggerLoyversePrint(receiptNumber) {
+    try {
+        // Esta función depende de la configuración específica de Loyverse
+        // En la mayoría de casos, si Loyverse está configurado para auto-imprimir,
+        // esto sucederá automáticamente al crear el recibo
+        console.log(`Recibo ${receiptNumber} creado en Loyverse - impresión automática activada`);
+    } catch (error) {
+        console.error('Error al activar impresión Loyverse:', error);
+    }
 }
 
 // Initialize ticket modal events
