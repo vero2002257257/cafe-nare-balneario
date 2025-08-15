@@ -51,7 +51,7 @@ async function initializeApp() {
         updateDashboard();
         showToast('Aplicación cargada correctamente', 'success');
         
-        // Mostrar estado de Loyverse si está en modo admin
+        // Mostrar estado de Loyverse si está en modo admin (sin prompts automáticos)
         if (isAdminMode && LOYVERSE_CONFIG.enabled) {
             showToast('Loyverse integrado ✓', 'info');
         }
@@ -127,11 +127,17 @@ function toggleSidebar() {
 function navigateToSection(sectionName) {
     // Update active menu item
     menuItems.forEach(item => item.classList.remove('active'));
-    document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+    const menuItem = document.querySelector(`[data-section="${sectionName}"]`);
+    if (menuItem) {
+        menuItem.classList.add('active');
+    }
     
     // Update active section
     sections.forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionName).classList.add('active');
+    const targetSection = document.getElementById(sectionName);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
     
     currentSection = sectionName;
     
@@ -1493,21 +1499,38 @@ function closeTicketModal() {
 // Configurar Loyverse desde el panel admin
 function configureLoyverse() {
     if (!isAdminMode) {
-        showToast('Acceso denegado', 'error');
+        showToast('Acceso denegado. Activa modo administrador primero.', 'error');
         return;
     }
     
-    const accessToken = prompt('Ingresa el Access Token de Loyverse API:');
-    const storeId = prompt('Ingresa el Store ID de Loyverse:');
+    // Verificar que estamos en la ventana activa
+    if (document.hidden) {
+        showToast('Por favor asegúrate de que esta pestaña esté activa', 'warning');
+        return;
+    }
     
-    if (accessToken && storeId) {
-        LOYVERSE_CONFIG.accessToken = accessToken;
-        LOYVERSE_CONFIG.storeId = storeId;
+    const accessToken = prompt('Ingresa el Access Token de Loyverse API:\n\nEjemplo: 99c19a699e2045c9bc349176da3f7e4f');
+    
+    if (accessToken && accessToken.trim() !== '') {
+        // Store ID es opcional, puede estar vacío
+        const storeId = prompt('Ingresa el Store ID de Loyverse (opcional, déjalo vacío si solo tienes una tienda):') || '';
+        
+        LOYVERSE_CONFIG.accessToken = accessToken.trim();
+        LOYVERSE_CONFIG.storeId = storeId.trim();
         LOYVERSE_CONFIG.enabled = true;
         
         // Guardar en localStorage
         localStorage.setItem('loyverse_config', JSON.stringify(LOYVERSE_CONFIG));
-        showToast('Configuración de Loyverse guardada ✓', 'success');
+        showToast('✓ Configuración de Loyverse guardada correctamente', 'success');
+        
+        // Mostrar resumen de configuración
+        console.log('Loyverse configurado:', {
+            tokenLength: accessToken.length,
+            storeId: storeId || 'No especificado',
+            enabled: true
+        });
+    } else if (accessToken !== null) {
+        showToast('Access Token es requerido', 'error');
     }
 }
 
