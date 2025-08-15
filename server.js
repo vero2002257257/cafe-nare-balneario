@@ -500,6 +500,46 @@ app.get('/api/export/excel', async (req, res) => {
     }
 });
 
+// Loyverse API - Get Stores (para obtener store_id)
+app.post('/api/loyverse/stores', async (req, res) => {
+    try {
+        const { accessToken } = req.body;
+        
+        if (!accessToken) {
+            return res.status(400).json({ error: 'Access token requerido' });
+        }
+        
+        console.log('Obteniendo tiendas de Loyverse...');
+        
+        const response = await fetch('https://api.loyverse.com/v1.0/stores', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const responseText = await response.text();
+        console.log('Respuesta stores:', response.status, responseText);
+        
+        if (response.ok) {
+            const result = JSON.parse(responseText);
+            res.json(result);
+        } else {
+            res.status(response.status).json({ 
+                error: `Error obteniendo tiendas: ${response.status}`,
+                details: responseText
+            });
+        }
+    } catch (error) {
+        console.error('Error obteniendo stores:', error);
+        res.status(500).json({ 
+            error: 'Error interno',
+            details: error.message 
+        });
+    }
+});
+
 // Loyverse API Proxy
 app.post('/api/loyverse/receipt', async (req, res) => {
     try {

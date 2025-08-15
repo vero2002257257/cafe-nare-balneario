@@ -1497,7 +1497,7 @@ function closeTicketModal() {
 // ===== LOYVERSE API INTEGRATION =====
 
 // Configurar Loyverse desde el panel admin
-function configureLoyverse() {
+async function configureLoyverse() {
     if (!isAdminMode) {
         showToast('Acceso denegado. Activa modo administrador primero.', 'error');
         return;
@@ -1512,23 +1512,71 @@ function configureLoyverse() {
     const accessToken = prompt('Ingresa el Access Token de Loyverse API:\n\nEjemplo: 99c19a699e2045c9bc349176da3f7e4f');
     
     if (accessToken && accessToken.trim() !== '') {
-        // Store ID es opcional, puede estar vacío
-        const storeId = prompt('Ingresa el Store ID de Loyverse (opcional, déjalo vacío si solo tienes una tienda):') || '';
+        showLoading();
+        showToast('Obteniendo información de tiendas...', 'info');
         
-        LOYVERSE_CONFIG.accessToken = accessToken.trim();
-        LOYVERSE_CONFIG.storeId = storeId.trim();
-        LOYVERSE_CONFIG.enabled = true;
-        
-        // Guardar en localStorage
-        localStorage.setItem('loyverse_config', JSON.stringify(LOYVERSE_CONFIG));
-        showToast('✓ Configuración de Loyverse guardada correctamente', 'success');
-        
-        // Mostrar resumen de configuración
-        console.log('Loyverse configurado:', {
-            tokenLength: accessToken.length,
-            storeId: storeId || 'No especificado',
-            enabled: true
-        });
+        try {
+            // Obtener automáticamente las tiendas usando el token
+            const storesResponse = await fetch(`${API_BASE}/loyverse/stores`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken.trim()
+                })
+            });
+            
+            const storesData = await storesResponse.json();
+            
+            let storeId = '';
+            
+            if (storesResponse.ok && storesData.stores && storesData.stores.length > 0) {
+                if (storesData.stores.length === 1) {
+                    // Si solo hay una tienda, usar automáticamente
+                    storeId = storesData.stores[0].id;
+                    showToast(`✓ Tienda encontrada: ${storesData.stores[0].name}`, 'success');
+                } else {
+                    // Si hay múltiples tiendas, mostrar opciones
+                    const storeOptions = storesData.stores.map((store, index) => 
+                        `${index + 1}. ${store.name} (ID: ${store.id})`
+                    ).join('\n');
+                    
+                    const selection = prompt(`Tiendas encontradas:\n${storeOptions}\n\nIngresa el número de tienda (1-${storesData.stores.length}):`);
+                    const storeIndex = parseInt(selection) - 1;
+                    
+                    if (storeIndex >= 0 && storeIndex < storesData.stores.length) {
+                        storeId = storesData.stores[storeIndex].id;
+                    } else {
+                        throw new Error('Selección inválida');
+                    }
+                }
+            } else {
+                // Fallback manual si la API falla
+                storeId = prompt('No se pudieron obtener tiendas automáticamente.\nIngresa manualmente el Store ID de Loyverse:') || '';
+            }
+            
+            LOYVERSE_CONFIG.accessToken = accessToken.trim();
+            LOYVERSE_CONFIG.storeId = storeId.trim();
+            LOYVERSE_CONFIG.enabled = true;
+            
+            // Guardar en localStorage
+            localStorage.setItem('loyverse_config', JSON.stringify(LOYVERSE_CONFIG));
+            showToast('✓ Configuración de Loyverse guardada correctamente', 'success');
+            
+            // Mostrar resumen de configuración
+            console.log('Loyverse configurado:', {
+                tokenLength: accessToken.length,
+                storeId: storeId || 'No especificado',
+                enabled: true
+            });
+            
+        } catch (error) {
+            console.error('Error configurando Loyverse:', error);
+            showToast(`Error: ${error.message}`, 'error');
+        } finally {
+            hideLoading();
+        }
     } else if (accessToken !== null) {
         showToast('Access Token es requerido', 'error');
     }
