@@ -568,8 +568,8 @@ app.post('/api/loyverse/receipt', async (req, res) => {
                 line_note: item.description || '',
                 taxes: [] // Sin impuestos por ahora
             })),
-            payment_types: [{
-                name: 'Efectivo',
+            payments: [{
+                payment_type_id: null, // Para efectivo
                 amount: Math.round(saleData.total * 100) // En centavos
             }],
             note: `Venta desde Café Nare - ${new Date().toLocaleString('es-CO')}`,
