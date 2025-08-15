@@ -8,6 +8,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const fetch = require('node-fetch');
 
 // Import data handlers
 const ExcelHandler = require('./handlers/excelHandler');
@@ -496,6 +497,78 @@ app.get('/api/export/excel', async (req, res) => {
     } catch (error) {
         console.error('Error exporting to Excel:', error);
         res.status(500).json({ error: 'Error al exportar a Excel: ' + error.message });
+    }
+});
+
+// Loyverse API Proxy
+app.post('/api/loyverse/receipt', async (req, res) => {
+    try {
+        const { accessToken, storeId, saleData, customerData } = req.body;
+        
+        if (!accessToken) {
+            return res.status(400).json({ error: 'Access token requerido' });
+        }
+        
+        // Formato de orden para Loyverse API
+        const loyverseOrder = {
+            store_id: storeId || undefined,
+            customer_id: customerData ? customerData.loyverseId : null,
+            customer: customerData ? {
+                name: customerData.name,
+                email: customerData.email || '',
+                phone_number: customerData.phone || ''
+            } : null,
+            line_items: saleData.items.map(item => ({
+                quantity: item.quantity,
+                item_name: item.productName,
+                variant_name: '', // No tenemos variantes
+                cost: Math.round(item.price * 100), // Loyverse usa centavos
+                price: Math.round(item.price * 100),
+                line_note: item.description || '',
+                taxes: [] // Sin impuestos por ahora
+            })),
+            payment_types: [{
+                name: 'Efectivo',
+                amount: Math.round(saleData.total * 100) // En centavos
+            }],
+            note: `Venta desde Café Nare - ${new Date().toLocaleString('es-CO')}`,
+            source: 'API'
+        };
+        
+        console.log('Enviando a Loyverse:', JSON.stringify(loyverseOrder, null, 2));
+        
+        const response = await fetch('https://api.loyverse.com/v1.0/receipts', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loyverseOrder)
+        });
+        
+        const responseText = await response.text();
+        console.log('Respuesta de Loyverse:', response.status, responseText);
+        
+        if (response.ok) {
+            const result = JSON.parse(responseText);
+            res.json({
+                success: true,
+                receipt_number: result.receipt_number,
+                message: 'Recibo creado en Loyverse exitosamente'
+            });
+        } else {
+            console.error('Error de Loyverse:', response.status, responseText);
+            res.status(response.status).json({ 
+                error: `Error Loyverse: ${response.status}`,
+                details: responseText
+            });
+        }
+    } catch (error) {
+        console.error('Error en proxy Loyverse:', error);
+        res.status(500).json({ 
+            error: 'Error interno del servidor',
+            details: error.message 
+        });
     }
 });
 
