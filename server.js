@@ -521,8 +521,8 @@ app.post('/api/loyverse/receipt', async (req, res) => {
             line_items: saleData.items.map((item, index) => ({
                 quantity: item.quantity,
                 item_name: item.productName,
-                // Usar un variant_id temporal basado en el producto
-                variant_id: `temp_variant_${item.productId || index}`,
+                // Generar UUID válido para variant_id (requerido por Loyverse)
+                variant_id: uuidv4(),
                 cost: Math.round(item.price * 100), // Loyverse usa centavos
                 price: Math.round(item.price * 100),
                 line_note: item.description || '',
