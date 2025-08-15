@@ -518,10 +518,11 @@ app.post('/api/loyverse/receipt', async (req, res) => {
                 email: customerData.email || '',
                 phone_number: customerData.phone || ''
             } : null,
-            line_items: saleData.items.map(item => ({
+            line_items: saleData.items.map((item, index) => ({
                 quantity: item.quantity,
                 item_name: item.productName,
-                variant_name: '', // No tenemos variantes
+                // Usar un variant_id temporal basado en el producto
+                variant_id: `temp_variant_${item.productId || index}`,
                 cost: Math.round(item.price * 100), // Loyverse usa centavos
                 price: Math.round(item.price * 100),
                 line_note: item.description || '',
