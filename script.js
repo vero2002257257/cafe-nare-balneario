@@ -8,6 +8,8 @@ let currentSale = {
     customer: null,
     total: 0
 };
+let currentSaleData = null;
+let currentCustomerData = null;
 let isAdminMode = false;
 const ADMIN_PASSWORD = 'CAFE2024'; // Cambiar por una contraseña más segura
 
@@ -748,8 +750,9 @@ async function completeSale() {
             // Solo mostrar opción manual si Loyverse no está configurado
             setTimeout(() => {
                 if (confirm('¿Desea imprimir el ticket para el cliente?')) {
-                    showTicket(saleData, customer);
-                    showToast('Modal de impresión abierto. Selecciona tu método preferido.', 'success');
+                    // Generar documento de impresión automáticamente
+                    generatePrintDocument(saleData, customer);
+                    showToast('Documento de impresión generado. Selecciona tu impresora preferida.', 'success');
                 }
             }, 500);
         }
@@ -1976,4 +1979,156 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     console.log('Modal del ticket inicializado. Usa testTicketModal() para probar.');
-});
+})
+
+// Función para generar documento de impresión automática
+function generatePrintDocument(saleData, customerData = null) {
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+    const printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Ticket - Café Nare Balneario</title>
+            <meta charset="UTF-8">
+            <style>
+                @media print {
+                    body { margin: 0; padding: 0; }
+                    .no-print { display: none !important; }
+                }
+                
+                body {
+                    font-family: 'Courier New', monospace;
+                    font-size: 12px;
+                    line-height: 1.2;
+                    margin: 0;
+                    padding: 10px;
+                    background: white;
+                }
+                
+                .ticket-header {
+                    text-align: center;
+                    border-bottom: 2px solid #000;
+                    padding-bottom: 10px;
+                    margin-bottom: 15px;
+                }
+                
+                .ticket-title {
+                    font-size: 18px;
+                    font-weight: bold;
+                    margin: 0;
+                }
+                
+                .ticket-subtitle {
+                    font-size: 14px;
+                    margin: 5px 0;
+                }
+                
+                .ticket-info {
+                    margin: 10px 0;
+                }
+                
+                .ticket-items {
+                    margin: 15px 0;
+                }
+                
+                .item-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 5px 0;
+                    border-bottom: 1px dotted #ccc;
+                    padding-bottom: 3px;
+                }
+                
+                .ticket-total {
+                    border-top: 2px solid #000;
+                    margin-top: 15px;
+                    padding-top: 10px;
+                    font-weight: bold;
+                }
+                
+                .ticket-footer {
+                    text-align: center;
+                    margin-top: 20px;
+                    font-size: 10px;
+                    border-top: 1px solid #000;
+                    padding-top: 10px;
+                }
+                
+                .print-button {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 16px;
+                }
+                
+                .print-button:hover {
+                    background: #0056b3;
+                }
+            </style>
+        </head>
+        <body>
+            <button class="print-button no-print" onclick="window.print()">
+                🖨️ Imprimir
+            </button>
+            
+            <div class="ticket-header">
+                <h1 class="ticket-title">CAFÉ NARE BALNEARIO</h1>
+                <p class="ticket-subtitle">Restaurante y Bar</p>
+                <p class="ticket-subtitle">Dirección del Local</p>
+                <p class="ticket-subtitle">Tel: (123) 456-7890</p>
+            </div>
+            
+            <div class="ticket-info">
+                <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
+                <p><strong>Hora:</strong> ${new Date().toLocaleTimeString('es-ES')}</p>
+                <p><strong>Ticket #:</strong> ${saleData.receipt_number || 'N/A'}</p>
+                ${customerData ? `<p><strong>Cliente:</strong> ${customerData.name || 'Cliente General'}</p>` : ''}
+            </div>
+            
+            <div class="ticket-items">
+                <h3>ITEMS:</h3>
+                ${saleData.line_items.map(item => `
+                    <div class="item-row">
+                        <span>${item.quantity}x ${item.item_name}</span>
+                        <span>$${(item.price / 100).toFixed(2)}</span>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="ticket-total">
+                <div class="item-row">
+                    <span><strong>TOTAL:</strong></span>
+                    <span><strong>$${(saleData.total_money / 100).toFixed(2)}</strong></span>
+                </div>
+            </div>
+            
+            <div class="ticket-footer">
+                <p>¡Gracias por su visita!</p>
+                <p>Esperamos verlo pronto</p>
+                <p>www.cafenarebalneario.com</p>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    
+    // Auto-abrir diálogo de impresión después de un breve delay
+    setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+    }, 500);
+    
+    return printWindow;
+}
+
+// ... existing code ...
+;
