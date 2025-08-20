@@ -179,6 +179,22 @@ body {
     padding: 20px;
 }
 
+/* Asegurar que el modal del ticket se muestre correctamente */
+#ticketModal {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+#ticketModal.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#ticketModal.active .modal-content {
+    transform: scale(1) !important;
+}
+
 .ticket-content {
     font-family: 'Courier New', monospace;
     background: white;

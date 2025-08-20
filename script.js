@@ -749,8 +749,7 @@ async function completeSale() {
             setTimeout(() => {
                 if (confirm('¿Desea imprimir el ticket para el cliente?')) {
                     showTicket(saleData, customer);
-                    // Mostrar modal con opciones de impresión
-                    showToast('Selecciona el método de impresión en el modal', 'info');
+                    showToast('Modal de impresión abierto. Selecciona tu método preferido.', 'success');
                 }
             }, 500);
         }
@@ -1370,8 +1369,19 @@ function showTicket(saleData, customerData = null) {
     const ticketModal = document.getElementById('ticketModal');
     const ticketContent = document.getElementById('ticketContent');
     
+    if (!ticketModal || !ticketContent) {
+        console.error('Elementos del modal no encontrados');
+        showToast('Error: Modal no disponible', 'error');
+        return;
+    }
+    
+    console.log('Mostrando modal del ticket...');
     ticketContent.innerHTML = generateTicket(saleData, customerData);
-    ticketModal.style.display = 'block';
+    ticketModal.classList.add('active');
+    
+    // Verificar que se agregó la clase
+    console.log('Modal activo:', ticketModal.classList.contains('active'));
+    console.log('Modal visible:', ticketModal.style.display, ticketModal.style.visibility, ticketModal.style.opacity);
 }
 
 function printTicket() {
@@ -1777,7 +1787,7 @@ function printTicketPreview() {
 }
 
 function closeTicketModal() {
-    document.getElementById('ticketModal').style.display = 'none';
+    document.getElementById('ticketModal').classList.remove('active');
 }
 
 // ===== LOYVERSE API INTEGRATION =====
@@ -1951,4 +1961,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+    
+    // Función de prueba para el modal (puedes ejecutarla desde la consola)
+    window.testTicketModal = function() {
+        const testData = {
+            items: [
+                { productName: 'Café Americano', quantity: 2, price: 3500 },
+                { productName: 'Croissant', quantity: 1, price: 2500 }
+            ],
+            total: 9500
+        };
+        showTicket(testData, { name: 'Cliente de Prueba' });
+        console.log('Modal de prueba abierto. Verifica que sea visible.');
+    };
+    
+    console.log('Modal del ticket inicializado. Usa testTicketModal() para probar.');
 });
