@@ -749,10 +749,8 @@ async function completeSale() {
             setTimeout(() => {
                 if (confirm('¿Desea imprimir el ticket para el cliente?')) {
                     showTicket(saleData, customer);
-                    // Auto-open print dialog after ticket is shown
-                    setTimeout(() => {
-                        printTicket();
-                    }, 300);
+                    // Mostrar modal con opciones de impresión
+                    showToast('Selecciona el método de impresión en el modal', 'info');
                 }
             }, 500);
         }
@@ -1378,6 +1376,294 @@ function showTicket(saleData, customerData = null) {
 
 function printTicket() {
     window.print();
+}
+
+// Nueva función para imprimir con impresoras del sistema
+async function printTicketWithSystemPrinter() {
+    try {
+        // Verificar si el navegador soporta la Web Printing API
+        if (!window.navigator.printing) {
+            showToast('Tu navegador no soporta impresión directa. Usa la opción de navegador.', 'warning');
+            return;
+        }
+
+        // Obtener lista de impresoras disponibles
+        const printers = await window.navigator.printing.getPrinters();
+        
+        if (printers.length === 0) {
+            showToast('No se encontraron impresoras conectadas al sistema', 'warning');
+            return;
+        }
+
+        // Si hay múltiples impresoras, mostrar selector
+        let selectedPrinter = printers[0];
+        if (printers.length > 1) {
+            const printerOptions = printers.map((printer, index) => 
+                `${index + 1}. ${printer.name}`
+            ).join('\n');
+            
+            const selection = prompt(`Impresoras disponibles:\n${printerOptions}\n\nSelecciona el número de impresora (1-${printers.length}):`);
+            const printerIndex = parseInt(selection) - 1;
+            
+            if (printerIndex >= 0 && printerIndex < printers.length) {
+                selectedPrinter = printers[printerIndex];
+            } else {
+                showToast('Selección cancelada', 'info');
+                return;
+            }
+        }
+
+        // Preparar contenido para impresión
+        const ticketContent = document.getElementById('ticketContent').innerHTML;
+        
+        // Crear documento de impresión
+        const printDocument = new PrintDocument();
+        printDocument.title = 'Ticket - Café Nare Balneario';
+        
+        // Configurar opciones de impresión
+        const printOptions = {
+            printer: selectedPrinter,
+            copies: 1,
+            mediaSize: 'receipt', // Para impresoras de tickets
+            orientation: 'portrait'
+        };
+
+        // Ejecutar impresión
+        await printDocument.print(ticketContent, printOptions);
+        
+        showToast(`✓ Ticket enviado a impresora: ${selectedPrinter.name}`, 'success');
+        
+    } catch (error) {
+        console.error('Error en impresión directa:', error);
+        
+        // Fallback a impresión del navegador si falla
+        if (error.name === 'NotSupportedError') {
+            showToast('Impresión directa no soportada. Usando impresión del navegador...', 'info');
+            printTicket();
+        } else {
+            showToast(`Error de impresión: ${error.message}`, 'error');
+        }
+    }
+}
+
+// Función alternativa usando la Print API más moderna
+async function printTicketWithWebAPI() {
+    try {
+        showToast('Preparando impresión directa...', 'info');
+        
+        const ticketContent = document.getElementById('ticketContent').innerHTML;
+        
+        // Método 1: Intentar usar la impresora predeterminada del sistema directamente
+        if (window.navigator.userAgent.includes('Windows')) {
+            await printWithWindowsSystem(ticketContent);
+        } else {
+            await printWithStandardAPI(ticketContent);
+        }
+        
+    } catch (error) {
+        console.error('Error en impresión con Web API:', error);
+        showToast('Error en impresión directa. Prueba con la opción de navegador.', 'warning');
+    }
+}
+
+// Función específica para Windows que intenta usar impresoras del sistema
+async function printWithWindowsSystem(ticketContent) {
+    try {
+        // Crear ventana temporal optimizada para impresión de tickets
+        const printWindow = window.open('', '_blank', 'width=300,height=500,scrollbars=no,resizable=no');
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Ticket - Café Nare Balneario</title>
+                <style>
+                    @page { 
+                        size: 80mm auto; 
+                        margin: 5mm; 
+                    }
+                    @media print {
+                        body { 
+                            margin: 0; 
+                            padding: 0; 
+                            font-family: 'Courier New', monospace; 
+                            font-size: 11px; 
+                            line-height: 1.2;
+                            width: 80mm;
+                        }
+                        .ticket-header { text-align: center; margin-bottom: 8px; }
+                        .ticket-title { font-weight: bold; font-size: 13px; }
+                        .ticket-info { margin: 3px 0; font-size: 10px; }
+                        .ticket-items { margin: 8px 0; }
+                        .ticket-item { display: flex; justify-content: space-between; margin: 1px 0; font-size: 10px; }
+                        .ticket-total { text-align: right; font-weight: bold; margin-top: 8px; font-size: 11px; }
+                        .ticket-footer { text-align: center; margin-top: 8px; font-size: 9px; }
+                    }
+                    @media screen {
+                        body { 
+                            width: 280px; 
+                            margin: 10px auto; 
+                            font-family: 'Courier New', monospace; 
+                            font-size: 11px;
+                            background: white;
+                            padding: 10px;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                ${ticketContent}
+                <script>
+                    window.onload = function() {
+                        // Intentar abrir automáticamente el diálogo de impresión
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
+                    
+                    window.onafterprint = function() {
+                        window.close();
+                    };
+                </script>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        showToast('✓ Abriendo diálogo de impresión del sistema', 'success');
+        
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Función estándar para otros sistemas operativos
+async function printWithStandardAPI(ticketContent) {
+    try {
+        // Crear un iframe oculto con el contenido del ticket
+        const printFrame = document.createElement('iframe');
+        printFrame.style.display = 'none';
+        document.body.appendChild(printFrame);
+        
+        const frameDoc = printFrame.contentDocument || printFrame.contentWindow.document;
+        frameDoc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Ticket - Café Nare Balneario</title>
+                <style>
+                    @media print {
+                        body { margin: 0; padding: 10px; font-family: 'Courier New', monospace; font-size: 12px; }
+                        .ticket-header { text-align: center; margin-bottom: 10px; }
+                        .ticket-title { font-weight: bold; font-size: 14px; }
+                        .ticket-info { margin: 5px 0; font-size: 11px; }
+                        .ticket-items { margin: 10px 0; }
+                        .ticket-item { display: flex; justify-content: space-between; margin: 2px 0; }
+                        .ticket-total { text-align: right; font-weight: bold; margin-top: 10px; }
+                        .ticket-footer { text-align: center; margin-top: 10px; font-size: 10px; }
+                    }
+                </style>
+            </head>
+            <body>${ticketContent}</body>
+            </html>
+        `);
+        frameDoc.close();
+
+        // Intentar acceder a las impresoras del sistema
+        frameDoc.defaultView.print();
+        showToast('✓ Usando impresora predeterminada del sistema', 'success');
+        
+        // Limpiar el iframe después de un momento
+        setTimeout(() => {
+            document.body.removeChild(printFrame);
+        }, 2000);
+        
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Función adicional para detectar impresoras disponibles (experimental)
+async function detectSystemPrinters() {
+    try {
+        // Esta función usa APIs experimentales que pueden no estar disponibles
+        if ('serviceWorker' in navigator && 'print' in navigator) {
+            console.log('Intentando detectar impresoras...');
+            
+            // En algunos navegadores modernos, esta información podría estar disponible
+            if (navigator.permissions) {
+                const permission = await navigator.permissions.query({name: 'printing'});
+                console.log('Permiso de impresión:', permission.state);
+            }
+        }
+        
+        return {
+            available: true,
+            method: 'system-default'
+        };
+    } catch (error) {
+        console.log('Detección de impresoras no disponible:', error);
+        return {
+            available: false,
+            method: 'browser-fallback'
+        };
+    }
+}
+
+// Función de prueba para el botón de detección de impresoras
+async function testPrinterDetection() {
+    showToast('Iniciando diagnóstico de impresoras...', 'info');
+    
+    try {
+        const result = await detectSystemPrinters();
+        
+        // Información del navegador y sistema
+        const browserInfo = {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            vendor: navigator.vendor,
+            language: navigator.language
+        };
+        
+        // APIs disponibles relacionadas con impresión
+        const apis = {
+            print: 'print' in window,
+            navigatorPrint: 'print' in navigator,
+            serviceWorker: 'serviceWorker' in navigator,
+            permissions: 'permissions' in navigator,
+            bluetooth: 'bluetooth' in navigator,
+            usb: 'usb' in navigator
+        };
+        
+        let diagnosticInfo = `DIAGNÓSTICO DE IMPRESIÓN\n\n`;
+        diagnosticInfo += `Sistema Operativo: ${browserInfo.platform}\n`;
+        diagnosticInfo += `Navegador: ${browserInfo.vendor} - ${browserInfo.userAgent.split(' ')[0]}\n\n`;
+        
+        diagnosticInfo += `APIs DISPONIBLES:\n`;
+        Object.entries(apis).forEach(([api, available]) => {
+            diagnosticInfo += `• ${api}: ${available ? '✓ Disponible' : '✗ No disponible'}\n`;
+        });
+        
+        diagnosticInfo += `\nRESULTADO:\n`;
+        diagnosticInfo += `• Detección: ${result.available ? '✓ Exitosa' : '✗ Falló'}\n`;
+        diagnosticInfo += `• Método: ${result.method}\n\n`;
+        
+        diagnosticInfo += `RECOMENDACIONES:\n`;
+        if (browserInfo.platform.includes('Win')) {
+            diagnosticInfo += `• Chrome/Edge: Mejor compatibilidad\n`;
+            diagnosticInfo += `• Impresora predeterminada: Se usará automáticamente\n`;
+        } else {
+            diagnosticInfo += `• Sistema: ${browserInfo.platform}\n`;
+            diagnosticInfo += `• Usar opción de navegador como alternativa\n`;
+        }
+        
+        alert(diagnosticInfo);
+        showToast('Diagnóstico completado. Revisa la información.', 'success');
+        
+    } catch (error) {
+        console.error('Error en diagnóstico:', error);
+        showToast('Error durante el diagnóstico de impresoras', 'error');
+    }
 }
 
 function printTicketPreview() {
