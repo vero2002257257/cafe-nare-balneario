@@ -1982,8 +1982,19 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 
 // Función para generar documento de impresión automática
+// Función para generar documento de impresión automática
 function generatePrintDocument(saleData, customerData = null) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+    // Convertir el formato de datos para que sea compatible
+    const convertedData = {
+        items: saleData.line_items ? saleData.line_items.map(item => ({
+            productName: item.item_name,
+            quantity: item.quantity,
+            price: item.price / 100  // Convertir de centavos a pesos
+        })) : [],
+        total: saleData.total_money ? saleData.total_money / 100 : 0
+    };
     
     const printContent = `
         <!DOCTYPE html>
@@ -2094,10 +2105,10 @@ function generatePrintDocument(saleData, customerData = null) {
             
             <div class="ticket-items">
                 <h3>ITEMS:</h3>
-                ${saleData.line_items.map(item => `
+                ${convertedData.items.map(item => `
                     <div class="item-row">
-                        <span>${item.quantity}x ${item.item_name}</span>
-                        <span>$${(item.price / 100).toFixed(2)}</span>
+                        <span>${item.quantity}x ${item.productName}</span>
+                        <span>$${item.price.toFixed(2)}</span>
                     </div>
                 `).join('')}
             </div>
@@ -2105,7 +2116,7 @@ function generatePrintDocument(saleData, customerData = null) {
             <div class="ticket-total">
                 <div class="item-row">
                     <span><strong>TOTAL:</strong></span>
-                    <span><strong>$${(saleData.total_money / 100).toFixed(2)}</strong></span>
+                    <span><strong>$${convertedData.total.toFixed(2)}</strong></span>
                 </div>
             </div>
             
@@ -2129,6 +2140,4 @@ function generatePrintDocument(saleData, customerData = null) {
     
     return printWindow;
 }
-
-// ... existing code ...
 ;
