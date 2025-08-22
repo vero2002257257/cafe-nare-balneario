@@ -28,11 +28,15 @@
             <i class="fas fa-coffee"></i>
             <span>Café Nare</span>
         </div>
-        <ul class="sidebar-menu">
-            <li><a href="#dashboard" class="menu-item active" data-section="dashboard">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a></li>
+                    <ul class="sidebar-menu">
+                <li><a href="#" class="menu-item active" data-section="venta-rapida">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Venta Rápida</span>
+                </a></li>
+                <li><a href="#dashboard" class="menu-item" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a></li>
             <li><a href="#products" class="menu-item" data-section="products">
                 <i class="fas fa-box"></i>
                 <span>Productos</span>
@@ -57,10 +61,54 @@
         </ul>
     </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="section active">
+            <!-- Main Content -->
+        <main class="main-content">
+            <!-- Venta Rápida Section -->
+            <section id="venta-rapida" class="section active">
+                <div class="section-header">
+                    <h2>🛒 Venta Rápida</h2>
+                    <p>Selecciona productos y completa la venta rápidamente</p>
+                </div>
+                
+                <!-- Barra de búsqueda de productos -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="ventaRapidaSearch" placeholder="Buscar productos...">
+                    </div>
+                </div>
+                
+                <!-- Grid de productos para venta rápida -->
+                <div class="products-grid-venta" id="productsGridVenta">
+                    <!-- Los productos se cargarán aquí -->
+                </div>
+                
+                <!-- Panel de venta actual -->
+                <div class="venta-rapida-panel" id="ventaRapidaPanel" style="display: none;">
+                    <div class="venta-header">
+                        <h3>🛍️ Venta en Progreso</h3>
+                        <div class="venta-total">
+                            <span>Total:</span>
+                            <strong id="ventaRapidaTotal">$0</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="venta-items" id="ventaRapidaItems">
+                        <!-- Items de la venta se mostrarán aquí -->
+                    </div>
+                    
+                    <div class="venta-actions">
+                        <button class="btn-secondary" id="cancelarVentaRapida">❌ Cancelar</button>
+                        <button class="btn-primary" id="completarVentaRapida">✅ Completar Venta</button>
+                        <button class="btn-print" id="probarImpresionRapida" style="background-color: #fd7e14;">
+                            🖨️ Probar Impresión
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section">
             <div class="section-header">
                 <h1>Dashboard</h1>
                 <div class="dashboard-actions">

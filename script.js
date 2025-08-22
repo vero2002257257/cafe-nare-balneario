@@ -119,6 +119,9 @@ function setupEventListeners() {
     
     // Modal Event Listeners
     setupModalEventListeners();
+    
+    // Event Listeners para Venta Rápida
+    setupVentaRapidaEventListeners();
 }
 
 // Navigation Functions
@@ -150,6 +153,9 @@ function navigateToSection(sectionName) {
     
     // Update section content
     switch(sectionName) {
+        case 'venta-rapida':
+            renderVentaRapidaProducts();
+            break;
         case 'dashboard':
             updateDashboard();
             break;
@@ -2237,3 +2243,327 @@ function generatePrintDocument(saleData, customerData = null) {
     return printWindow;
 }
 ;
+
+// ===== FUNCIONES DE VENTA RÁPIDA =====
+
+// Función para renderizar productos en venta rápida
+function renderVentaRapidaProducts() {
+    const container = document.getElementById('productsGridVenta');
+    
+    if (!container) return;
+    
+    if (products.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-light); grid-column: 1/-1;">No hay productos disponibles</p>';
+        return;
+    }
+    
+    container.innerHTML = products.map(product => `
+        <div class="product-card-venta" onclick="agregarProductoVentaRapida('${product.id}')">
+            <div class="product-image">
+                ${product.image ? 
+                    `<img src="${product.image}" alt="${product.name}">` : 
+                    '<i class="fas fa-coffee"></i>'
+                }
+            </div>
+            <div class="product-info">
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
+                <div class="product-details">
+                    <span class="product-price">${formatCurrency(product.price)}</span>
+                    <span class="product-stock ${product.stock <= product.minStock ? 'stock-low' : ''}">
+                        ${product.stock} disponibles
+                    </span>
+                </div>
+                <div class="add-to-cart">
+                    <i class="fas fa-plus-circle"></i> Agregar
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Función para agregar producto a la venta rápida
+function agregarProductoVentaRapida(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product || product.stock === 0) {
+        showToast('Producto no disponible', 'warning');
+        return;
+    }
+    
+    // Inicializar currentSale si no existe
+    if (!window.currentSale) {
+        window.currentSale = { items: [], customer: null, total: 0 };
+    }
+    
+    // Mostrar panel de venta si no está visible
+    const panel = document.getElementById('ventaRapidaPanel');
+    if (panel && panel.style.display === 'none') {
+        panel.style.display = 'block';
+    }
+    
+    const existingItem = window.currentSale.items.find(item => item.productId === productId);
+    
+    if (existingItem) {
+        if (existingItem.quantity < product.stock) {
+            existingItem.quantity++;
+        } else {
+            showToast('No hay suficiente stock', 'warning');
+            return;
+        }
+    } else {
+        window.currentSale.items.push({
+            productId: product.id,
+            productName: product.name,
+            price: product.price,
+            quantity: 1
+        });
+    }
+    
+    renderVentaRapidaItems();
+    updateVentaRapidaTotal();
+    showToast(`${product.name} agregado a la venta`, 'success');
+}
+
+// Función para renderizar items de la venta rápida
+function renderVentaRapidaItems() {
+    const container = document.getElementById('ventaRapidaItems');
+    if (!container || !window.currentSale) return;
+    
+    if (window.currentSale.items.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No hay productos en la venta</p>';
+        return;
+    }
+    
+    container.innerHTML = window.currentSale.items.map((item, index) => `
+        <div class="venta-item">
+            <div class="venta-item-info">
+                <strong>${item.productName}</strong>
+                <br>
+                <small>${formatCurrency(item.price)} c/u</small>
+            </div>
+            <div class="venta-item-controls">
+                <div class="quantity-control">
+                    <button class="quantity-btn" onclick="updateVentaRapidaQuantity(${index}, -1)">-</button>
+                    <input type="number" class="quantity-input" value="${item.quantity}" min="1" 
+                           onchange="setVentaRapidaQuantity(${index}, this.value)">
+                    <button class="quantity-btn" onclick="updateVentaRapidaQuantity(${index}, 1)">+</button>
+                </div>
+                <strong>${formatCurrency(item.price * item.quantity)}</strong>
+                <button class="btn-icon btn-delete" onclick="removeVentaRapidaItem(${index})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Función para actualizar total de venta rápida
+function updateVentaRapidaTotal() {
+    if (!window.currentSale) return;
+    
+    window.currentSale.total = window.currentSale.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalElement = document.getElementById('ventaRapidaTotal');
+    if (totalElement) {
+        totalElement.textContent = formatCurrency(window.currentSale.total);
+    }
+}
+
+// Función para actualizar cantidad en venta rápida
+function updateVentaRapidaQuantity(index, change) {
+    if (!window.currentSale || !window.currentSale.items[index]) return;
+    
+    const item = window.currentSale.items[index];
+    const product = products.find(p => p.id === item.productId);
+    const newQuantity = item.quantity + change;
+    
+    if (newQuantity <= 0) {
+        removeVentaRapidaItem(index);
+        return;
+    }
+    
+    if (newQuantity > product.stock) {
+        showToast('No hay suficiente stock', 'warning');
+        return;
+    }
+    
+    item.quantity = newQuantity;
+    renderVentaRapidaItems();
+    updateVentaRapidaTotal();
+}
+
+// Función para establecer cantidad en venta rápida
+function setVentaRapidaQuantity(index, quantity) {
+    if (!window.currentSale || !window.currentSale.items[index]) return;
+    
+    const item = window.currentSale.items[index];
+    const product = products.find(p => p.id === item.productId);
+    const newQuantity = parseInt(quantity);
+    
+    if (newQuantity <= 0) {
+        removeVentaRapidaItem(index);
+        return;
+    }
+    
+    if (newQuantity > product.stock) {
+        showToast('No hay suficiente stock', 'warning');
+        item.quantity = product.stock;
+    } else {
+        item.quantity = newQuantity;
+    }
+    
+    renderVentaRapidaItems();
+    updateVentaRapidaTotal();
+}
+
+// Función para remover item de venta rápida
+function removeVentaRapidaItem(index) {
+    if (!window.currentSale) return;
+    
+    window.currentSale.items.splice(index, 1);
+    renderVentaRapidaItems();
+    updateVentaRapidaTotal();
+    
+    // Ocultar panel si no hay items
+    if (window.currentSale.items.length === 0) {
+        const panel = document.getElementById('ventaRapidaPanel');
+        if (panel) {
+            panel.style.display = 'none';
+        }
+    }
+}
+
+// Función para cancelar venta rápida
+function cancelarVentaRapida() {
+    window.currentSale = { items: [], customer: null, total: 0 };
+    const panel = document.getElementById('ventaRapidaPanel');
+    if (panel) {
+        panel.style.display = 'none';
+    }
+    showToast('Venta cancelada', 'info');
+}
+
+// Función para completar venta rápida
+async function completarVentaRapida() {
+    if (!window.currentSale || window.currentSale.items.length === 0) {
+        showToast('Agrega al menos un producto a la venta', 'warning');
+        return;
+    }
+    
+    const saleData = {
+        customerId: null,
+        customerName: 'Cliente General',
+        items: window.currentSale.items,
+        total: window.currentSale.total
+    };
+    
+    showLoading();
+    try {
+        // Registrar venta
+        await apiCall('/sales', 'POST', saleData);
+        showToast('Venta registrada correctamente ✓', 'success');
+        
+        // Generar documento de impresión automáticamente
+        generatePrintDocument(saleData);
+        showToast('Documento de impresión generado. Selecciona tu impresora preferida.', 'success');
+        
+        // Limpiar venta
+        cancelarVentaRapida();
+        renderSales();
+        updateDashboard();
+        
+    } catch (error) {
+        showToast('Error al registrar la venta', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Función para probar impresión en venta rápida
+function probarImpresionVentaRapida() {
+    if (!window.currentSale || window.currentSale.items.length === 0) {
+        showToast('No hay productos en la venta actual', 'warning');
+        return;
+    }
+    
+    const testSaleData = {
+        items: window.currentSale.items,
+        total: window.currentSale.total,
+        date: new Date().toLocaleString(),
+        id: 'TEST-' + Date.now()
+    };
+    
+    generatePrintDocument(testSaleData);
+}
+
+// Función para filtrar productos en venta rápida
+function filterVentaRapidaProducts() {
+    const search = document.getElementById('ventaRapidaSearch').value.toLowerCase();
+    
+    let filteredProducts = products.filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(search) ||
+                            product.description.toLowerCase().includes(search);
+        return matchesSearch;
+    });
+    
+    renderVentaRapidaProductsFiltered(filteredProducts);
+}
+
+// Función para renderizar productos filtrados en venta rápida
+function renderVentaRapidaProductsFiltered(productsToShow) {
+    const container = document.getElementById('productsGridVenta');
+    
+    if (!container) return;
+    
+    if (productsToShow.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-light); grid-column: 1/-1;">No se encontraron productos</p>';
+        return;
+    }
+    
+    container.innerHTML = productsToShow.map(product => `
+        <div class="product-card-venta" onclick="agregarProductoVentaRapida('${product.id}')">
+            <div class="product-image">
+                ${product.image ? 
+                    `<img src="${product.image}" alt="${product.name}">` : 
+                    '<i class="fas fa-coffee"></i>'
+                }
+            </div>
+            <div class="product-info">
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
+                <div class="product-details">
+                    <span class="product-price">${formatCurrency(product.price)}</span>
+                    <span class="product-stock ${product.stock <= product.minStock ? 'stock-low' : ''}">
+                        ${product.stock} disponibles
+                    </span>
+                </div>
+                <div class="add-to-cart">
+                    <i class="fas fa-plus-circle"></i> Agregar
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Event Listeners para Venta Rápida
+function setupVentaRapidaEventListeners() {
+    const searchInput = document.getElementById('ventaRapidaSearch');
+    const cancelarBtn = document.getElementById('cancelarVentaRapida');
+    const completarBtn = document.getElementById('completarVentaRapida');
+    const probarImpresionBtn = document.getElementById('probarImpresionRapida');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', filterVentaRapidaProducts);
+    }
+    
+    if (cancelarBtn) {
+        cancelarBtn.addEventListener('click', cancelarVentaRapida);
+    }
+    
+    if (completarBtn) {
+        completarBtn.addEventListener('click', completarVentaRapida);
+    }
+    
+    if (probarImpresionBtn) {
+        probarImpresionBtn.addEventListener('click', probarImpresionVentaRapida);
+    }
+}
