@@ -691,6 +691,13 @@ function setupSalesEventListeners() {
     newSaleBtn.addEventListener('click', startNewSale);
     cancelSaleBtn.addEventListener('click', cancelSale);
     completeSaleBtn.addEventListener('click', completeSale);
+    
+    // Event listener para el botón de prueba de impresión
+    const testPrintBtn = document.getElementById('testPrintBtn');
+    if (testPrintBtn) {
+        testPrintBtn.addEventListener('click', testPrintWithCurrentSale);
+    }
+    
     saleProductSearch.addEventListener('input', searchProductsForSale);
     
     // Setup customer select
@@ -1982,6 +1989,95 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 
 // Función para generar documento de impresión automática
+// Función para probar impresión con datos actuales de la venta
+function testPrintWithCurrentSale() {
+    console.log('Iniciando prueba de impresión...');
+    
+    // Debug: verificar elementos del DOM
+    const saleItems = document.querySelectorAll('.sale-item');
+    const saleTotal = document.getElementById('saleTotal');
+    
+    console.log('Elementos de venta encontrados:', saleItems.length);
+    console.log('Elemento total encontrado:', saleTotal);
+    
+    if (saleItems.length === 0) {
+        showToast('No hay productos en la venta actual. Agrega productos primero.', 'warning');
+        return;
+    }
+    
+    // Obtener datos actuales de la venta
+    const currentItems = getCurrentSaleItems();
+    const currentTotal = getCurrentSaleTotal();
+    
+    console.log('Items extraídos:', currentItems);
+    console.log('Total extraído:', currentTotal);
+    
+    if (currentItems.length === 0) {
+        showToast('Error al extraer datos de los productos. Verifica la estructura del HTML.', 'error');
+        return;
+    }
+    
+    // Crear objeto de venta con formato correcto
+    const testSaleData = {
+        items: currentItems,
+        total: currentTotal,
+        date: new Date().toLocaleString(),
+        id: 'TEST-' + Date.now()
+    };
+    
+    console.log('Datos de prueba para impresión:', testSaleData);
+    
+    // Generar y abrir documento de impresión
+    generatePrintDocument(testSaleData);
+}
+
+// Función para obtener items actuales de la venta
+function getCurrentSaleItems() {
+    const items = [];
+    const saleItems = document.querySelectorAll('.sale-item');
+    
+    saleItems.forEach(item => {
+        // Buscar el nombre del producto en el primer div (sale-item-info)
+        const nameElement = item.querySelector('.sale-item-info strong');
+        const name = nameElement ? nameElement.textContent : 'Producto desconocido';
+        
+        // Buscar la cantidad en el input de cantidad
+        const quantityInput = item.querySelector('.quantity-input');
+        const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+        
+        // Buscar el precio en el texto pequeño (c/u)
+        const priceElement = item.querySelector('.sale-item-info small');
+        const priceText = priceElement ? priceElement.textContent : '';
+        const price = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
+        
+        if (name && quantity > 0 && price > 0) {
+            items.push({
+                name: name,
+                quantity: quantity,
+                price: price,
+                total: quantity * price
+            });
+        }
+    });
+    
+    return items;
+}
+
+// Función para obtener total actual de la venta
+function getCurrentSaleTotal() {
+    const totalElement = document.getElementById('saleTotal');
+    if (!totalElement) {
+        console.warn('Elemento saleTotal no encontrado');
+        return 0;
+    }
+    
+    const totalText = totalElement.textContent;
+    // Extraer solo números del texto (remover $ y otros caracteres)
+    const total = parseFloat(totalText.replace(/[^\d.]/g, '')) || 0;
+    
+    return total;
+}
+
 // Función para generar documento de impresión automática
 function generatePrintDocument(saleData, customerData = null) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
