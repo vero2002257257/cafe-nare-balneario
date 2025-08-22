@@ -1,0 +1,534 @@
+{
+  "products": [
+    {
+      "id": "cafe_helado",
+      "name": "Café Helado",
+      "description": "Café Helado",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "capuccino",
+      "name": "Capuccino",
+      "description": "Capuccino",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "mocacino",
+      "name": "Mocacino",
+      "description": "Mocacino",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "cafe_latte",
+      "name": "Café Latte",
+      "description": "Café Latte",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "americano",
+      "name": "Americano",
+      "description": "Americano",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "expresso",
+      "name": "Expresso",
+      "description": "Expresso",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "aromatica_frutos",
+      "name": "Aromática Frutos",
+      "description": "Aromática Frutos",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "chocolate",
+      "name": "Chocolate",
+      "description": "Chocolate",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "jugo_natural",
+      "name": "Jugo Natural",
+      "description": "Jugo Natural",
+      "price": 8000,
+      "stock": 200,
+      "minStock": 20,
+      "category": "bebidas",
+      "image": null
+    },
+    {
+      "id": "cerveza_budweiser",
+      "name": "Cerveza Budweiser",
+      "description": "Cerveza Budweiser",
+      "price": 8000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_pilsen_laton",
+      "name": "Cerveza Pilsen Latón",
+      "description": "Cerveza Pilsen Latón",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_bitburger",
+      "name": "Cerveza Bitburger",
+      "description": "Cerveza Bitburger",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_bbc_rose",
+      "name": "Cerveza BBC Rose",
+      "description": "Cerveza BBC Rose",
+      "price": 3500,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_bcc_miel",
+      "name": "Cerveza BCC Miel",
+      "description": "Cerveza BCC Miel",
+      "price": 2500,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "club_colombia_dorada",
+      "name": "Club Colombia Dorada",
+      "description": "Club Colombia Dorada",
+      "price": 2500,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_aguila_original",
+      "name": "Cerveza Aguila Original",
+      "description": "Cerveza Aguila Original",
+      "price": 3500,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_corona_extra",
+      "name": "Cerveza Corona Extra",
+      "description": "Cerveza Corona Extra",
+      "price": 4000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_stella",
+      "name": "Cerveza Stella",
+      "description": "Cerveza Stella",
+      "price": 5000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_heineken",
+      "name": "Cerveza Heineken",
+      "description": "Cerveza Heineken",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_redds",
+      "name": "Cerveza Redds",
+      "description": "Cerveza Redds",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_peroni",
+      "name": "Cerveza Peroni",
+      "description": "Cerveza Peroni",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_andina",
+      "name": "Cerveza Andina",
+      "description": "Cerveza Andina",
+      "price": 5000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "cerveza_andina_light",
+      "name": "Cerveza Andina Light",
+      "description": "Cerveza Andina Light",
+      "price": 5000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "cervezas",
+      "image": null
+    },
+    {
+      "id": "hidra_tao",
+      "name": "HIDRA TAO",
+      "description": "HIDRA TAO",
+      "price": 7000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "gatorade",
+      "name": "Gatorade",
+      "description": "Gatorade",
+      "price": 7000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "electrolit",
+      "name": "Electrolit",
+      "description": "Electrolit",
+      "price": 15000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "four_loko",
+      "name": "FOUR LOKO",
+      "description": "FOUR LOKO",
+      "price": 8000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "jp",
+      "name": "JP",
+      "description": "JP",
+      "price": 8000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "cuba_libre_ron_coca",
+      "name": "Cuba Libre Ron y Coca Cola",
+      "description": "Cuba Libre Ron y Coca Cola",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "cuba_libre_mojito",
+      "name": "CUBA LIBRE MOJITO de ron viejo de caldas",
+      "description": "CUBA LIBRE MOJITO de ron viejo de caldas",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "smirnoff",
+      "name": "Smirnoff",
+      "description": "Smirnoff",
+      "price": 6500,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "redbull",
+      "name": "Redubull",
+      "description": "Redubull",
+      "price": 7000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "agua_brisa_saborizada",
+      "name": "Agua Brisa Saborizada",
+      "description": "Agua Brisa Saborizada",
+      "price": 6500,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "agua_manantial",
+      "name": "Agua sin Gas Manantial",
+      "description": "Agua sin Gas Manantial",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "hatsu_te",
+      "name": "Hatsu Té",
+      "description": "Hatsu Té",
+      "price": 8000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "liquidos",
+      "image": null
+    },
+    {
+      "id": "paquete_papas",
+      "name": "Paquete Papas",
+      "description": "Paquete Papas",
+      "price": 8000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "snacks",
+      "image": null
+    },
+    {
+      "id": "producto_6000",
+      "name": "Producto 6000",
+      "description": "Producto 6000",
+      "price": 6000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_12000",
+      "name": "Producto 12000",
+      "description": "Producto 12000",
+      "price": 12000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_20000",
+      "name": "Producto 20000",
+      "description": "Producto 20000",
+      "price": 20000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_15000_1",
+      "name": "Producto 15000",
+      "description": "Producto 15000",
+      "price": 15000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_15000_2",
+      "name": "Producto 15000",
+      "description": "Producto 15000",
+      "price": 15000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_15000_3",
+      "name": "Producto 15000",
+      "description": "Producto 15000",
+      "price": 15000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_11000",
+      "name": "Producto 11000",
+      "description": "Producto 11000",
+      "price": 11000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_2500",
+      "name": "Producto 2500",
+      "description": "Producto 2500",
+      "price": 2500,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_7000",
+      "name": "Producto 7000",
+      "description": "Producto 7000",
+      "price": 7000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "producto_4000",
+      "name": "Producto 4000",
+      "description": "Producto 4000",
+      "price": 4000,
+      "stock": 30,
+      "minStock": 5,
+      "category": "otros",
+      "image": null
+    },
+    {
+      "id": "paquete_x12",
+      "name": "Paquete x12",
+      "description": "Paquete x12",
+      "price": 28000,
+      "stock": 40,
+      "minStock": 5,
+      "category": "chocolates_cafe",
+      "image": null
+    },
+    {
+      "id": "unidad_x4_chocolates",
+      "name": "Unidad x4 Chocolates",
+      "description": "Unidad x4 Chocolates",
+      "price": 3000,
+      "stock": 40,
+      "minStock": 5,
+      "category": "chocolates_cafe",
+      "image": null
+    },
+    {
+      "id": "unidad_x10_chocolates",
+      "name": "Unidad x10 Chocolates",
+      "description": "Unidad x10 Chocolates",
+      "price": 7000,
+      "stock": 40,
+      "minStock": 5,
+      "category": "chocolates_cafe",
+      "image": null
+    },
+    {
+      "id": "chocolatina",
+      "name": "Chocolatina",
+      "description": "Chocolatina",
+      "price": 7000,
+      "stock": 40,
+      "minStock": 5,
+      "category": "chocolates_cafe",
+      "image": null
+    },
+    {
+      "id": "cafe_125g",
+      "name": "Café 125g",
+      "description": "Café 125g",
+      "price": 15000,
+      "stock": 50,
+      "minStock": 5,
+      "category": "chocolates_cafe",
+      "image": null
+    },
+    {
+      "id": "cafe_250g",
+      "name": "Café 250g",
+      "description": "Café 250g",
+      "price": 24000,
+      "stock": 50,
+      "minStock": 5,
+      "category": "chocolates_cafe",
+      "image": null
+    },
+    {
+      "id": "cafe_500g",
+      "name": "Café 500g",
+      "description": "Café 500g",
+      "price": 42000,
+      "stock": 50,
+      "minStock": 5,
+      "category": "chocolates_cafe",
+      "image": null
+    }
+  ]
+}

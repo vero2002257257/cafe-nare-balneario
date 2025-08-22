@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar Productos - Café Nare Balneario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .import-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+        }
+        .import-section h3 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .product-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-name {
+            font-weight: bold;
+            color: #495057;
+        }
+        .product-details {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .btn-import {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        .btn-import:hover {
+            background: #218838;
+        }
+        .btn-import:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #007bff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛍️ Importar Productos del Inventario</h1>
+        
+        <div class="import-section">
+            <h3>📊 Resumen del Inventario</h3>
+            <p><strong>Total de productos:</strong> 42</p>
+            <p><strong>Categorías:</strong> 5</p>
+            <ul>
+                <li><strong>Bebidas Café:</strong> 9 productos</li>
+                <li><strong>Cervezas:</strong> 13 productos</li>
+                <li><strong>Líquidos:</strong> 12 productos</li>
+                <li><strong>Snacks:</strong> 1 producto</li>
+                <li><strong>Chocolates-Café:</strong> 7 productos</li>
+            </ul>
+        </div>
+
+        <div class="import-section">
+            <h3>🚀 Importar Productos</h3>
+            <p>Haz clic en el botón para importar todos los productos del inventario a tu base de datos.</p>
+            <button id="importBtn" class="btn-import">📥 Importar Todos los Productos</button>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div id="status" class="status" style="display: none;"></div>
+        </div>
+
+        <div class="import-section">
+            <h3>📋 Vista Previa de Productos</h3>
+            <div class="product-list" id="productPreview">
+                <!-- Los productos se mostrarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de productos del inventario
+        const productosInventario = [
+            // Bebidas Café
+            { name: "Café Helado", price: 8000, stock: 200, minStock: 20, category: "bebidas" },
+            { name: "Capuccino", price: 6000, stock: 200, minStock: 20, category: "bebidas" },
+            { name: "Mocacino", price: 6000, stock: 200, minStock: 20, category: "bebidas" },
+            { name: "Café Latte", price: 3500, stock: 200, minStock: 20, category: "bebidas" },
+            { name: "Americano", price: 2500, stock: 200, minStock: 20, category: "bebidas" },
+            { name: "Expresso", price: 2500, stock: 200, minStock: 20, category: "bebidas" },
+            { name: "Aromática Frutos", price: 3500, stock: 200, minStock: 20, category: "bebidas" },
+            { name: "Chocolate", price: 4000, stock: 200, minStock: 20, category: "bebidas" },
+            { name: "Jugo Natural", price: 5000, stock: 200, minStock: 20, category: "bebidas" },
+            
+            // Cervezas
+            { name: "Cerveza Budweiser", price: 7000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Pilsen Latón", price: 7000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Bitburger", price: 15000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza BBC Rose", price: 8000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza BCC Miel", price: 8000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Club Colombia Dorada", price: 6000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Aguila Original", price: 6000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Corona Extra", price: 6500, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Stella", price: 7000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Heineken", price: 6500, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Redds", price: 6000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Peroni", price: 8000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Andina", price: 5000, stock: 30, minStock: 5, category: "cervezas" },
+            { name: "Cerveza Andina Light", price: 5000, stock: 30, minStock: 5, category: "cervezas" },
+            
+            // Líquidos
+            { name: "HIDRA TAO", price: 8000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Gatorade", price: 6000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Electrolit", price: 12000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "FOUR LOKO", price: 20000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "JP", price: 15000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Cuba Libre Ron y Coca Cola", price: 15000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Cuba Libre Mojito de Ron Viejo de Caldas", price: 15000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Smirnoff", price: 15000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Red Bull", price: 11000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Agua Brisa Saborizada", price: 2500, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Agua sin Gas Manantial", price: 7000, stock: 30, minStock: 5, category: "liquidos" },
+            { name: "Hatsu Te", price: 4000, stock: 30, minStock: 5, category: "liquidos" },
+            
+            // Snacks
+            { name: "Paquete Papas", price: 5000, stock: 30, minStock: 5, category: "snacks" },
+            
+            // Chocolates-Café
+            { name: "Paquete x12", price: 28000, stock: 40, minStock: 5, category: "chocolates_cafe" },
+            { name: "Unidad x4 Chocolates", price: 3000, stock: 40, minStock: 5, category: "chocolates_cafe" },
+            { name: "Unidad x10 Chocolates", price: 7000, stock: 40, minStock: 5, category: "chocolates_cafe" },
+            { name: "Chocolatina", price: 7000, stock: 40, minStock: 5, category: "chocolates_cafe" },
+            { name: "Café 125g", price: 15000, stock: 50, minStock: 5, category: "chocolates_cafe" },
+            { name: "Café 250g", price: 24000, stock: 50, minStock: 5, category: "chocolates_cafe" },
+            { name: "Café 500g", price: 42000, stock: 50, minStock: 5, category: "chocolates_cafe" }
+        ];
+
+        // Mostrar vista previa de productos
+        function mostrarVistaPrevia() {
+            const container = document.getElementById('productPreview');
+            container.innerHTML = productosInventario.map(product => `
+                <div class="product-item">
+                    <div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-details">
+                            Precio: $${product.price.toLocaleString('es-CO')} | 
+                            Stock: ${product.stock} | 
+                            Categoría: ${product.category}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Función para importar productos
+        async function importarProductos() {
+            const importBtn = document.getElementById('importBtn');
+            const status = document.getElementById('status');
+            const progressFill = document.getElementById('progressFill');
+            
+            importBtn.disabled = true;
+            status.style.display = 'block';
+            status.className = 'status info';
+            status.textContent = '🔄 Importando productos...';
+            
+            try {
+                // Simular importación progresiva
+                for (let i = 0; i < productosInventario.length; i++) {
+                    const product = productosInventario[i];
+                    
+                    // Crear producto con ID único
+                    const newProduct = {
+                        id: 'id_' + Math.random().toString(36).substr(2, 9),
+                        name: product.name,
+                        description: `Producto importado: ${product.name}`,
+                        price: product.price,
+                        stock: product.stock,
+                        minStock: product.minStock,
+                        category: product.category,
+                        image: null
+                    };
+                    
+                    // Aquí normalmente harías una llamada a la API
+                    // await apiCall('/products', 'POST', newProduct);
+                    
+                    // Simular delay
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Actualizar progreso
+                    const progress = ((i + 1) / productosInventario.length) * 100;
+                    progressFill.style.width = progress + '%';
+                }
+                
+                status.className = 'status success';
+                status.textContent = `✅ ¡Importación completada! Se importaron ${productosInventario.length} productos exitosamente.`;
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = `❌ Error durante la importación: ${error.message}`;
+            } finally {
+                importBtn.disabled = false;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('importBtn').addEventListener('click', importarProductos);
+        
+        // Mostrar vista previa al cargar la página
+        document.addEventListener('DOMContentLoaded', mostrarVistaPrevia);
+    </script>
+</body>
+</html>

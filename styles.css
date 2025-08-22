@@ -1339,6 +1339,68 @@ body {
 }
 
 /* Venta Rápida Styles */
+
+/* ESTILOS PARA LAS PESTAÑAS DE CATEGORÍAS */
+.categories-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.category-tab {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 25px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.category-tab:hover {
+    background: #e9ecef;
+    border-color: #dee2e6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.category-tab.active {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+}
+
+.category-tab i {
+    font-size: 16px;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .categories-tabs {
+        gap: 8px;
+        margin: 15px 0;
+    }
+    
+    .category-tab {
+        padding: 10px 16px;
+        min-width: 100px;
+        font-size: 14px;
+    }
+    
+    .category-tab i {
+        font-size: 14px;
+    }
+}
+
 .products-grid-venta {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1528,22 +1590,34 @@ body {
 
 .venta-actions {
     display: flex;
-    gap: 15px;
+    gap: 10px;
+    flex-wrap: wrap;
     justify-content: center;
-}
-
-.venta-actions .btn {
-    padding: 12px 24px;
-    font-size: 1rem;
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--bg-light);
     border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
 }
 
-.venta-actions .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+.venta-actions button {
+    min-width: 140px;
+    font-weight: 500;
+}
+
+.venta-actions .btn-success {
+    order: 1;
+}
+
+.venta-actions .btn-primary {
+    order: 2;
+}
+
+.venta-actions .btn-secondary {
+    order: 3;
+}
+
+.venta-actions .btn-print {
+    order: 4;
 }
 
 /* Responsive adjustments */
@@ -1565,4 +1639,23 @@ body {
     .venta-actions .btn {
         width: 100%;
     }
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-success:active {
+    background-color: #1e7e34;
 }

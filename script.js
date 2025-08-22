@@ -13,6 +13,10 @@ let currentCustomerData = null;
 let isAdminMode = false;
 const ADMIN_PASSWORD = 'CAFE2024'; // Cambiar por una contraseña más segura
 
+// Variables para categorías de productos
+let currentCategory = 'all';
+let allProducts = [];
+
 // API Base URL - works both locally and on Railway
 const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 
@@ -154,7 +158,7 @@ function navigateToSection(sectionName) {
     // Update section content
     switch(sectionName) {
         case 'venta-rapida':
-            renderVentaRapidaProducts();
+            renderVentaRapidaProducts('all'); // Cargar todos los productos por defecto
             break;
         case 'dashboard':
             updateDashboard();
@@ -314,54 +318,74 @@ function getMockData(endpoint, method, data) {
 async function loadProducts() {
     try {
         products = await apiCall('/products');
-        if (products.length === 0) {
-            // Initialize with sample data
-            products = [
-                {
-                    id: 'prod_1',
-                    name: 'Café Americano',
-                    description: 'Café negro tradicional, fuerte y aromático',
-                    category: 'bebidas-calientes',
-                    price: 3500,
-                    stock: 50,
-                    minStock: 10,
-                    image: null
-                },
-                {
-                    id: 'prod_2',
-                    name: 'Cappuccino',
-                    description: 'Café con leche espumosa y canela',
-                    category: 'bebidas-calientes',
-                    price: 4500,
-                    stock: 30,
-                    minStock: 5,
-                    image: null
-                },
-                {
-                    id: 'prod_3',
-                    name: 'Croissant',
-                    description: 'Croissant francés recién horneado',
-                    category: 'postres',
-                    price: 2500,
-                    stock: 8,
-                    minStock: 10,
-                    image: null
-                },
-                {
-                    id: 'prod_4',
-                    name: 'Jugo de Naranja',
-                    description: 'Jugo natural de naranja recién exprimido',
-                    category: 'bebidas-frias',
-                    price: 3000,
-                    stock: 25,
-                    minStock: 5,
-                    image: null
-                }
-            ];
+        
+        // Si la API devuelve menos de 10 productos, cargar productos locales
+        if (products.length < 10) {
+            await loadLocalProducts();
         }
     } catch (error) {
-        console.error('Error loading products:', error);
-        products = [];
+        console.error('Error loading products from API:', error);
+        // Si falla la API, cargar productos locales
+        await loadLocalProducts();
+    }
+}
+
+// Función para cargar productos del archivo local
+async function loadLocalProducts() {
+    try {
+        const response = await fetch('./productos_inventario.json');
+        
+        if (response.ok) {
+            const data = await response.json();
+            products = data.products || [];
+        } else {
+            throw new Error(`No se pudo cargar el archivo de productos. Status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error loading local products:', error);
+        // Initialize with sample data como fallback
+        products = [
+            {
+                id: 'prod_1',
+                name: 'Café Americano',
+                description: 'Café Americano',
+                category: 'bebidas',
+                price: 8000,
+                stock: 200,
+                minStock: 20,
+                image: null
+            },
+            {
+                id: 'prod_2',
+                name: 'Capuccino',
+                description: 'Capuccino',
+                category: 'bebidas',
+                price: 8000,
+                stock: 200,
+                minStock: 20,
+                image: null
+            },
+            {
+                id: 'prod_3',
+                name: 'Cerveza Budweiser',
+                description: 'Cerveza Budweiser',
+                category: 'cervezas',
+                price: 8000,
+                stock: 30,
+                minStock: 5,
+                image: null
+            },
+            {
+                id: 'prod_4',
+                name: 'HIDRA TAO',
+                description: 'HIDRA TAO',
+                category: 'liquidos',
+                price: 7000,
+                stock: 30,
+                minStock: 5,
+                image: null
+            }
+        ];
     }
 }
 
@@ -2247,39 +2271,80 @@ function generatePrintDocument(saleData, customerData = null) {
 // ===== FUNCIONES DE VENTA RÁPIDA =====
 
 // Función para renderizar productos en venta rápida
-function renderVentaRapidaProducts() {
-    const container = document.getElementById('productsGridVenta');
+function renderVentaRapidaProducts(category = 'all') {
+    currentCategory = category;
     
-    if (!container) return;
-    
-    if (products.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-light); grid-column: 1/-1;">No hay productos disponibles</p>';
-        return;
+    // Si no tenemos productos cargados, los cargamos
+    if (allProducts.length === 0) {
+        allProducts = products.map(product => ({
+            ...product,
+            category: determineProductCategory(product.name)
+        }));
     }
     
-    container.innerHTML = products.map(product => `
-        <div class="product-card-venta" onclick="agregarProductoVentaRapida('${product.id}')">
-            <div class="product-image">
-                ${product.image ? 
-                    `<img src="${product.image}" alt="${product.name}">` : 
-                    '<i class="fas fa-coffee"></i>'
-                }
-            </div>
-            <div class="product-info">
-                <h3 class="product-name">${product.name}</h3>
-                <p class="product-description">${product.description}</p>
-                <div class="product-details">
-                    <span class="product-price">${formatCurrency(product.price)}</span>
-                    <span class="product-stock ${product.stock <= product.minStock ? 'stock-low' : ''}">
-                        ${product.stock} disponibles
-                    </span>
-                </div>
-                <div class="add-to-cart">
-                    <i class="fas fa-plus-circle"></i> Agregar
-                </div>
-            </div>
-        </div>
-    `).join('');
+    let productsToShow = allProducts;
+    
+    // Filtrar por categoría si no es "all"
+    if (category !== 'all') {
+        productsToShow = allProducts.filter(product => product.category === category);
+    }
+    
+    renderVentaRapidaProductsFiltered(productsToShow);
+}
+
+// Función para determinar la categoría de un producto basado en su nombre
+function determineProductCategory(productName) {
+    const name = productName.toLowerCase();
+    
+    // Bebidas Café
+    if (name.includes('café') || name.includes('cafe') || name.includes('capuccino') || name.includes('mocacino') ||
+        name.includes('latte') || name.includes('americano') || name.includes('expresso') || name.includes('aromatica') ||
+        name.includes('chocolate') || name.includes('jugo')) {
+        return 'bebidas';
+    } 
+    // Cervezas
+    else if (name.includes('cerveza') || name.includes('budweiser') || name.includes('pilsen') || name.includes('bitburger') ||
+             name.includes('bbc') || name.includes('club colombia') || name.includes('aguila') || name.includes('corona') ||
+             name.includes('stella') || name.includes('heineken') || name.includes('redds') || name.includes('peroni') ||
+             name.includes('andina')) {
+        return 'cervezas';
+    } 
+    // Líquidos
+    else if (name.includes('hidra') || name.includes('gatorade') || name.includes('electrolit') || name.includes('four loko') ||
+             name.includes('jp') || name.includes('cuba libre') || name.includes('smirnoff') || name.includes('redbull') ||
+             name.includes('agua') || name.includes('hatsu') || name.includes('te')) {
+        return 'liquidos';
+    } 
+    // Snacks
+    else if (name.includes('papas') || name.includes('chips') || name.includes('snack')) {
+        return 'snacks';
+    } 
+    // Chocolates-Café
+    else if (name.includes('chocolate') || name.includes('chocolatina') || name.includes('café 125g') || 
+             name.includes('café 250g') || name.includes('café 500g') || name.includes('paquete x12') ||
+             name.includes('unidad x4') || name.includes('unidad x10')) {
+        return 'chocolates_cafe';
+    } 
+    else {
+        return 'otros';
+    }
+}
+
+// Función para cambiar categoría activa
+function changeCategory(category) {
+    // Remover clase active de todas las pestañas
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Agregar clase active a la pestaña seleccionada
+    const selectedTab = document.querySelector(`[data-category="${category}"]`);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+    
+    // Renderizar productos de la categoría
+    renderVentaRapidaProducts(category);
 }
 
 // Función para agregar producto a la venta rápida
@@ -2439,7 +2504,6 @@ function cancelarVentaRapida() {
     if (panel) {
         panel.style.display = 'none';
     }
-    showToast('Venta cancelada', 'info');
 }
 
 // Función para completar venta rápida
@@ -2458,18 +2522,90 @@ async function completarVentaRapida() {
     
     showLoading();
     try {
-        // Registrar venta
+        // Registrar venta en el backend
         await apiCall('/sales', 'POST', saleData);
-        showToast('Venta registrada correctamente ✓', 'success');
         
-        // Generar documento de impresión automáticamente
-        generatePrintDocument(saleData);
-        showToast('Documento de impresión generado. Selecciona tu impresora preferida.', 'success');
+        // Actualizar stock local
+        window.currentSale.items.forEach(item => {
+            const product = products.find(p => p.id === item.productId);
+            if (product) {
+                product.stock -= item.quantity;
+            }
+        });
+        
+        // Enviar a Loyverse API si está configurado
+        const loyverseResult = await sendToLoyverse(saleData, null);
+        
+        if (loyverseResult) {
+            showToast('Venta registrada y enviada a Loyverse ✓', 'success');
+            // Con Loyverse configurado, la impresión será automática
+            showToast('Ticket enviado a impresora automáticamente 🖨️', 'info');
+        } else {
+            showToast('Venta registrada correctamente ✓', 'success');
+            
+            // Generar documento de impresión automáticamente
+            generatePrintDocument(saleData);
+            showToast('Documento de impresión generado. Selecciona tu impresora preferida.', 'success');
+        }
         
         // Limpiar venta
         cancelarVentaRapida();
         renderSales();
         updateDashboard();
+        
+        // Actualizar la vista de productos para mostrar el nuevo stock
+        renderVentaRapidaProducts(currentCategory);
+        
+    } catch (error) {
+        showToast('Error al registrar la venta', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Función para vender sin imprimir (solo registrar)
+async function venderRapida() {
+    if (!window.currentSale || window.currentSale.items.length === 0) {
+        showToast('Agrega al menos un producto a la venta', 'warning');
+        return;
+    }
+    
+    const saleData = {
+        customerId: null,
+        customerName: 'Cliente General',
+        items: window.currentSale.items,
+        total: window.currentSale.total
+    };
+    
+    showLoading();
+    try {
+        // Registrar venta en el backend
+        await apiCall('/sales', 'POST', saleData);
+        
+        // Actualizar stock local
+        window.currentSale.items.forEach(item => {
+            const product = products.find(p => p.id === item.productId);
+            if (product) {
+                product.stock -= item.quantity;
+            }
+        });
+        
+        // Enviar a Loyverse API si está configurado
+        const loyverseResult = await sendToLoyverse(saleData, null);
+        
+        if (loyverseResult) {
+            showToast('Venta registrada y enviada a Loyverse ✓', 'success');
+        } else {
+            showToast('Venta registrada correctamente ✓', 'success');
+        }
+        
+        // Limpiar venta
+        cancelarVentaRapida();
+        renderSales();
+        updateDashboard();
+        
+        // Actualizar la vista de productos para mostrar el nuevo stock
+        renderVentaRapidaProducts(currentCategory);
         
     } catch (error) {
         showToast('Error al registrar la venta', 'error');
@@ -2497,15 +2633,24 @@ function probarImpresionVentaRapida() {
 
 // Función para filtrar productos en venta rápida
 function filterVentaRapidaProducts() {
-    const search = document.getElementById('ventaRapidaSearch').value.toLowerCase();
+    const searchTerm = document.getElementById('ventaRapidaSearch').value.toLowerCase();
     
-    let filteredProducts = products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(search) ||
-                            product.description.toLowerCase().includes(search);
-        return matchesSearch;
-    });
+    let productsToShow = allProducts;
     
-    renderVentaRapidaProductsFiltered(filteredProducts);
+    // Primero filtrar por categoría actual
+    if (currentCategory !== 'all') {
+        productsToShow = allProducts.filter(product => product.category === currentCategory);
+    }
+    
+    // Luego filtrar por término de búsqueda
+    if (searchTerm) {
+        productsToShow = productsToShow.filter(product => 
+            product.name.toLowerCase().includes(searchTerm) ||
+            product.description.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    renderVentaRapidaProductsFiltered(productsToShow);
 }
 
 // Función para renderizar productos filtrados en venta rápida
@@ -2524,7 +2669,7 @@ function renderVentaRapidaProductsFiltered(productsToShow) {
             <div class="product-image">
                 ${product.image ? 
                     `<img src="${product.image}" alt="${product.name}">` : 
-                    '<i class="fas fa-coffee"></i>'
+                    getProductCategoryIcon(product.category)
                 }
             </div>
             <div class="product-info">
@@ -2544,10 +2689,30 @@ function renderVentaRapidaProductsFiltered(productsToShow) {
     `).join('');
 }
 
+// Función para obtener el ícono según la categoría del producto
+function getProductCategoryIcon(category) {
+    switch(category) {
+        case 'bebidas':
+            return '<i class="fas fa-coffee" style="color: #8B4513;"></i>';
+        case 'cervezas':
+            return '<i class="fas fa-beer" style="color: #FFD700;"></i>';
+        case 'liquidos':
+            return '<i class="fas fa-tint" style="color: #00BFFF;"></i>';
+        case 'snacks':
+            return '<i class="fas fa-cookie-bite" style="color: #FF6B35;"></i>';
+        case 'chocolates_cafe':
+            return '<i class="fas fa-mug-hot" style="color: #8B0000;"></i>';
+        case 'otros':
+        default:
+            return '<i class="fas fa-box" style="color: #6c757d;"></i>';
+    }
+}
+
 // Event Listeners para Venta Rápida
 function setupVentaRapidaEventListeners() {
     const searchInput = document.getElementById('ventaRapidaSearch');
     const cancelarBtn = document.getElementById('cancelarVentaRapida');
+    const venderBtn = document.getElementById('venderRapida');
     const completarBtn = document.getElementById('completarVentaRapida');
     const probarImpresionBtn = document.getElementById('probarImpresionRapida');
     
@@ -2556,7 +2721,14 @@ function setupVentaRapidaEventListeners() {
     }
     
     if (cancelarBtn) {
-        cancelarBtn.addEventListener('click', cancelarVentaRapida);
+        cancelarBtn.addEventListener('click', () => {
+            cancelarVentaRapida();
+            showToast('Venta cancelada', 'info');
+        });
+    }
+    
+    if (venderBtn) {
+        venderBtn.addEventListener('click', venderRapida);
     }
     
     if (completarBtn) {
@@ -2566,4 +2738,19 @@ function setupVentaRapidaEventListeners() {
     if (probarImpresionBtn) {
         probarImpresionBtn.addEventListener('click', probarImpresionVentaRapida);
     }
+    
+    // Configurar pestañas de categorías
+    setupCategoryTabs();
 }
+
+// Función para configurar los event listeners de las pestañas
+function setupCategoryTabs() {
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const category = tab.getAttribute('data-category');
+            changeCategory(category);
+        });
+    });
+}
+
+

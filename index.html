@@ -78,6 +78,28 @@
                     </div>
                 </div>
                 
+                <!-- PESTAÑAS DE CATEGORÍAS -->
+                <div class="categories-tabs">
+                    <button class="category-tab active" data-category="all">
+                        <i class="fas fa-th"></i> Todos
+                    </button>
+                    <button class="category-tab" data-category="bebidas">
+                        <i class="fas fa-coffee"></i> Bebidas Café
+                    </button>
+                    <button class="category-tab" data-category="cervezas">
+                        <i class="fas fa-beer"></i> Cervezas
+                    </button>
+                    <button class="category-tab" data-category="liquidos">
+                        <i class="fas fa-wine-glass-alt"></i> Líquidos
+                    </button>
+                    <button class="category-tab" data-category="snacks">
+                        <i class="fas fa-cookie"></i> Snacks
+                    </button>
+                    <button class="category-tab" data-category="chocolates_cafe">
+                        <i class="fas fa-chocolate-bar"></i> Chocolates-Café
+                    </button>
+                </div>
+                
                 <!-- Grid de productos para venta rápida -->
                 <div class="products-grid-venta" id="productsGridVenta">
                     <!-- Los productos se cargarán aquí -->
@@ -98,11 +120,23 @@
                     </div>
                     
                     <div class="venta-actions">
+                        <!-- Botones de acción para la venta -->
                         <button class="btn-secondary" id="cancelarVentaRapida">❌ Cancelar</button>
-                        <button class="btn-primary" id="completarVentaRapida">✅ Completar Venta</button>
+                        <button class="btn-success" id="venderRapida" style="background-color: #28a745;">
+                            💰 Vender
+                        </button>
+                        <button class="btn-primary" id="completarVentaRapida">✅ Completar Venta e Imprimir</button>
                         <button class="btn-print" id="probarImpresionRapida" style="background-color: #fd7e14;">
                             🖨️ Probar Impresión
                         </button>
+                    </div>
+                    
+                    <!-- Descripción de los botones -->
+                    <div class="venta-actions-info">
+                        <small style="color: var(--text-light); text-align: center; display: block; margin-top: 10px;">
+                            <strong>💰 Vender:</strong> Registra la venta sin imprimir | 
+                            <strong>✅ Completar Venta e Imprimir:</strong> Registra la venta y genera ticket para impresión
+                        </small>
                     </div>
                 </div>
             </section>
