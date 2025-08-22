@@ -636,12 +636,28 @@ async function deleteProduct(productId) {
     if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
         showLoading();
         try {
+            // Eliminar del backend
             await apiCall(`/products/${productId}`, 'DELETE');
+            
+            // Eliminar de la variable local products
             products = products.filter(p => p.id !== productId);
+            
+            // Eliminar también de allProducts si existe
+            if (allProducts.length > 0) {
+                allProducts = allProducts.filter(p => p.id !== productId);
+            }
+            
             renderProducts();
             updateDashboard();
+            
+            // Si estamos en venta rápida, actualizar también esa vista
+            if (currentSection === 'venta-rapida') {
+                renderVentaRapidaProducts(currentCategory);
+            }
+            
             showToast('Producto eliminado correctamente', 'success');
         } catch (error) {
+            console.error('Error al eliminar producto:', error);
             showToast('Error al eliminar el producto', 'error');
         } finally {
             hideLoading();
@@ -1095,6 +1111,9 @@ function openProductModal(product = null) {
     const title = document.getElementById('productModalTitle');
     const form = document.getElementById('productForm');
     
+    // Actualizar las opciones de categoría con todas las disponibles
+    updateProductCategoryOptions();
+    
     if (product) {
         title.textContent = 'Editar Producto';
         document.getElementById('productName').value = product.name;
@@ -1111,6 +1130,33 @@ function openProductModal(product = null) {
     }
     
     modal.classList.add('active');
+}
+
+// Función para actualizar las opciones de categoría en el modal
+function updateProductCategoryOptions() {
+    const categorySelect = document.getElementById('productCategory');
+    if (!categorySelect) return;
+    
+    // Categorías actualizadas que incluyen las nuevas
+    const categories = [
+        { value: 'bebidas', label: 'Bebidas Café' },
+        { value: 'cervezas', label: 'Cervezas' },
+        { value: 'liquidos', label: 'Líquidos' },
+        { value: 'snacks', label: 'Snacks' },
+        { value: 'chocolates_cafe', label: 'Chocolates y Café' },
+        { value: 'otros', label: 'Otros' }
+    ];
+    
+    // Limpiar opciones existentes
+    categorySelect.innerHTML = '';
+    
+    // Agregar nuevas opciones
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.value;
+        option.textContent = category.label;
+        categorySelect.appendChild(option);
+    });
 }
 
 function openCustomerModal(customer = null) {
@@ -1156,19 +1202,50 @@ async function handleProductSubmit(e) {
     showLoading();
     try {
         if (isEdit) {
-            await apiCall(`/products/${isEdit}`, 'PUT', productData);
+            // Actualizar en el backend
+            const updatedProduct = await apiCall(`/products/${isEdit}`, 'PUT', productData);
+            
+            // Actualizar en la variable local
             const productIndex = products.findIndex(p => p.id === isEdit);
-            products[productIndex] = { ...products[productIndex], ...productData };
+            if (productIndex !== -1) {
+                products[productIndex] = { ...products[productIndex], ...productData };
+            }
+            
+            // Actualizar también en allProducts si existe
+            if (allProducts.length > 0) {
+                const allProductIndex = allProducts.findIndex(p => p.id === isEdit);
+                if (allProductIndex !== -1) {
+                    allProducts[allProductIndex] = { ...allProducts[allProductIndex], ...productData };
+                }
+            }
+            
             showToast('Producto actualizado correctamente', 'success');
         } else {
+            // Crear nuevo producto
             const newProduct = await apiCall('/products', 'POST', productData);
+            
+            // Agregar a la variable local
+            products.push(newProduct);
+            
+            // Agregar también a allProducts si existe
+            if (allProducts.length > 0) {
+                allProducts.push(newProduct);
+            }
+            
             showToast('Producto creado correctamente', 'success');
         }
         
         closeModal('productModal');
         renderProducts();
         updateDashboard();
+        
+        // Si estamos en venta rápida, actualizar también esa vista
+        if (currentSection === 'venta-rapida') {
+            renderVentaRapidaProducts(currentCategory);
+        }
+        
     } catch (error) {
+        console.error('Error al guardar producto:', error);
         showToast('Error al guardar el producto', 'error');
     } finally {
         hideLoading();
@@ -1219,15 +1296,35 @@ async function handleStockSubmit(e) {
     
     showLoading();
     try {
+        // Actualizar en el backend
         await apiCall(`/products/${productId}/stock`, 'PUT', { stock: newStock });
+        
+        // Actualizar en la variable local products
         const product = products.find(p => p.id === productId);
-        product.stock = newStock;
+        if (product) {
+            product.stock = newStock;
+        }
+        
+        // Actualizar también en allProducts si existe
+        if (allProducts.length > 0) {
+            const allProduct = allProducts.find(p => p.id === productId);
+            if (allProduct) {
+                allProduct.stock = newStock;
+            }
+        }
         
         closeModal('stockModal');
         renderInventory();
         updateDashboard();
+        
+        // Si estamos en venta rápida, actualizar también esa vista
+        if (currentSection === 'venta-rapida') {
+            renderVentaRapidaProducts(currentCategory);
+        }
+        
         showToast('Stock actualizado correctamente', 'success');
     } catch (error) {
+        console.error('Error al actualizar stock:', error);
         showToast('Error al actualizar el stock', 'error');
     } finally {
         hideLoading();
