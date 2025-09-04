@@ -14,7 +14,7 @@ const fetch = require('node-fetch');
 // Import data handlers
 const ExcelHandler = require('./handlers/excelHandler');
 const GoogleSheetsHandler = require('./handlers/googleSheetsHandler');
-const PrinterHandler = require('./handlers/printerHandler');
+const { default: PrinterHandler } = require('./handlers/printerHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
