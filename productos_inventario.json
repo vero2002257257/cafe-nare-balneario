@@ -1,7 +1,7 @@
 {
   "products": [
     {
-      "id": "cafe_helado",
+      "id": "5e241432-a3a9-4bc5-a20d-824a0d99cc97",
       "name": "Café Helado",
       "description": "Café Helado",
       "price": 8000,
@@ -11,7 +11,7 @@
       "image": null
     },
     {
-      "id": "capuccino",
+      "id": "dbb6f728-c808-4be8-8f09-3bb8d2939b79",
       "name": "Capuccino",
       "description": "Capuccino",
       "price": 8000,
@@ -21,7 +21,7 @@
       "image": null
     },
     {
-      "id": "mocacino",
+      "id": "fd7fe4a5-bed8-4228-8144-44f8a34cf0e4",
       "name": "Mocacino",
       "description": "Mocacino",
       "price": 8000,
@@ -31,7 +31,7 @@
       "image": null
     },
     {
-      "id": "cafe_latte",
+      "id": "c71d4d45-9c5e-498c-9e9b-6146f2568196",
       "name": "Café Latte",
       "description": "Café Latte",
       "price": 8000,
@@ -41,7 +41,7 @@
       "image": null
     },
     {
-      "id": "americano",
+      "id": "1d4d8ee4-7185-46fc-940d-650dd943134e",
       "name": "Americano",
       "description": "Americano",
       "price": 8000,
@@ -51,7 +51,7 @@
       "image": null
     },
     {
-      "id": "expresso",
+      "id": "fae1e58b-6c6e-4279-8cfb-3b78e655f209",
       "name": "Expresso",
       "description": "Expresso",
       "price": 8000,
@@ -61,7 +61,7 @@
       "image": null
     },
     {
-      "id": "aromatica_frutos",
+      "id": "72dd90fb-e83a-40d2-946d-a9e51a68d4b1",
       "name": "Aromática Frutos",
       "description": "Aromática Frutos",
       "price": 8000,
@@ -71,7 +71,7 @@
       "image": null
     },
     {
-      "id": "chocolate",
+      "id": "8b2dff88-83c3-46a5-952f-b50b4b11eb27",
       "name": "Chocolate",
       "description": "Chocolate",
       "price": 8000,
@@ -81,7 +81,7 @@
       "image": null
     },
     {
-      "id": "jugo_natural",
+      "id": "698e3d39-4c38-4a48-aefe-c02f30855a4c",
       "name": "Jugo Natural",
       "description": "Jugo Natural",
       "price": 8000,
@@ -91,7 +91,7 @@
       "image": null
     },
     {
-      "id": "cerveza_budweiser",
+      "id": "a5bee58f-eaff-4a0b-a70c-a12ea64c1ffc",
       "name": "Cerveza Budweiser",
       "description": "Cerveza Budweiser",
       "price": 8000,
@@ -101,7 +101,7 @@
       "image": null
     },
     {
-      "id": "cerveza_pilsen_laton",
+      "id": "0f9a8f05-5756-4b39-b616-2d2cf845c720",
       "name": "Cerveza Pilsen Latón",
       "description": "Cerveza Pilsen Latón",
       "price": 6000,
@@ -111,7 +111,7 @@
       "image": null
     },
     {
-      "id": "cerveza_bitburger",
+      "id": "6231c73d-b372-44c3-a437-26ccd8c05297",
       "name": "Cerveza Bitburger",
       "description": "Cerveza Bitburger",
       "price": 6000,
@@ -121,7 +121,7 @@
       "image": null
     },
     {
-      "id": "cerveza_bbc_rose",
+      "id": "59e9da1c-f47a-4a20-ab90-2b3c5a39f9b3",
       "name": "Cerveza BBC Rose",
       "description": "Cerveza BBC Rose",
       "price": 3500,
@@ -131,7 +131,7 @@
       "image": null
     },
     {
-      "id": "cerveza_bcc_miel",
+      "id": "ea9c8c11-e7b1-4afa-bb79-5a3531ed746f",
       "name": "Cerveza BCC Miel",
       "description": "Cerveza BCC Miel",
       "price": 2500,
@@ -141,7 +141,7 @@
       "image": null
     },
     {
-      "id": "club_colombia_dorada",
+      "id": "aa1ab231-dd99-4ea5-a03b-53a8df7fb2c3",
       "name": "Club Colombia Dorada",
       "description": "Club Colombia Dorada",
       "price": 2500,
@@ -151,7 +151,7 @@
       "image": null
     },
     {
-      "id": "cerveza_aguila_original",
+      "id": "1faeceb4-5c1b-4407-80a6-0da9b358164e",
       "name": "Cerveza Aguila Original",
       "description": "Cerveza Aguila Original",
       "price": 3500,
@@ -161,7 +161,7 @@
       "image": null
     },
     {
-      "id": "cerveza_corona_extra",
+      "id": "0745e0a5-c3ef-4a0d-9ad4-b9117be351a0",
       "name": "Cerveza Corona Extra",
       "description": "Cerveza Corona Extra",
       "price": 4000,
@@ -171,7 +171,7 @@
       "image": null
     },
     {
-      "id": "cerveza_stella",
+      "id": "a2c484da-4e03-4a51-a31f-32c6c98c0812",
       "name": "Cerveza Stella",
       "description": "Cerveza Stella",
       "price": 5000,
@@ -181,7 +181,7 @@
       "image": null
     },
     {
-      "id": "cerveza_heineken",
+      "id": "7bcfe9e9-f1d6-4f7f-88e3-5c99d825edf3",
       "name": "Cerveza Heineken",
       "description": "Cerveza Heineken",
       "price": 6000,
@@ -191,7 +191,7 @@
       "image": null
     },
     {
-      "id": "cerveza_redds",
+      "id": "4afe4a41-4ce8-45b2-85bb-e6dfe863a4ae",
       "name": "Cerveza Redds",
       "description": "Cerveza Redds",
       "price": 6000,
@@ -201,7 +201,7 @@
       "image": null
     },
     {
-      "id": "cerveza_peroni",
+      "id": "dffc77a0-664e-4083-9523-f7d37692f71e",
       "name": "Cerveza Peroni",
       "description": "Cerveza Peroni",
       "price": 6000,
@@ -211,7 +211,7 @@
       "image": null
     },
     {
-      "id": "cerveza_andina",
+      "id": "2c1afff6-9199-4342-8349-959abc32d61e",
       "name": "Cerveza Andina",
       "description": "Cerveza Andina",
       "price": 5000,
@@ -221,7 +221,7 @@
       "image": null
     },
     {
-      "id": "cerveza_andina_light",
+      "id": "87dde888-ba0b-4f73-9613-72703c12ba06",
       "name": "Cerveza Andina Light",
       "description": "Cerveza Andina Light",
       "price": 5000,
@@ -231,7 +231,7 @@
       "image": null
     },
     {
-      "id": "hidra_tao",
+      "id": "eef58094-811c-4735-8624-0ccf78d7fddf",
       "name": "HIDRA TAO",
       "description": "HIDRA TAO",
       "price": 7000,
@@ -241,7 +241,7 @@
       "image": null
     },
     {
-      "id": "gatorade",
+      "id": "4563871f-d614-4828-8f51-35f63693b769",
       "name": "Gatorade",
       "description": "Gatorade",
       "price": 7000,
@@ -251,7 +251,7 @@
       "image": null
     },
     {
-      "id": "electrolit",
+      "id": "0aaf4d41-2cc3-4369-b8ae-db46f1d7330c",
       "name": "Electrolit",
       "description": "Electrolit",
       "price": 15000,
@@ -261,7 +261,7 @@
       "image": null
     },
     {
-      "id": "four_loko",
+      "id": "abbbb5b5-b322-432b-b529-7236626ff820",
       "name": "FOUR LOKO",
       "description": "FOUR LOKO",
       "price": 8000,
@@ -271,7 +271,7 @@
       "image": null
     },
     {
-      "id": "jp",
+      "id": "a3816dbf-0cc4-4a77-acc8-158b8692ddad",
       "name": "JP",
       "description": "JP",
       "price": 8000,
@@ -281,7 +281,7 @@
       "image": null
     },
     {
-      "id": "cuba_libre_ron_coca",
+      "id": "d6272ef6-6a2c-453f-91c5-cfcaa7a010ac",
       "name": "Cuba Libre Ron y Coca Cola",
       "description": "Cuba Libre Ron y Coca Cola",
       "price": 6000,
@@ -291,7 +291,7 @@
       "image": null
     },
     {
-      "id": "cuba_libre_mojito",
+      "id": "538a4ff5-cc10-41be-a34e-7b839ca8689a",
       "name": "CUBA LIBRE MOJITO de ron viejo de caldas",
       "description": "CUBA LIBRE MOJITO de ron viejo de caldas",
       "price": 6000,
@@ -301,7 +301,7 @@
       "image": null
     },
     {
-      "id": "smirnoff",
+      "id": "2df1413f-c9ca-4835-a2de-6ea90bc065e3",
       "name": "Smirnoff",
       "description": "Smirnoff",
       "price": 6500,
@@ -311,7 +311,7 @@
       "image": null
     },
     {
-      "id": "redbull",
+      "id": "45c2f9c4-0e0e-4730-ad3d-bdc2dd8d8a6e",
       "name": "Redubull",
       "description": "Redubull",
       "price": 7000,
@@ -321,7 +321,7 @@
       "image": null
     },
     {
-      "id": "agua_brisa_saborizada",
+      "id": "ea863b43-d1cd-4d4c-9a6a-5abba20c6ffc",
       "name": "Agua Brisa Saborizada",
       "description": "Agua Brisa Saborizada",
       "price": 6500,
@@ -331,7 +331,7 @@
       "image": null
     },
     {
-      "id": "agua_manantial",
+      "id": "a4a07fe0-2eeb-46bb-8f0c-86ae480d0d3c",
       "name": "Agua sin Gas Manantial",
       "description": "Agua sin Gas Manantial",
       "price": 6000,
@@ -341,7 +341,7 @@
       "image": null
     },
     {
-      "id": "hatsu_te",
+      "id": "977b1ca4-8bcc-4e44-8f91-d52092b72280",
       "name": "Hatsu Té",
       "description": "Hatsu Té",
       "price": 8000,
@@ -351,7 +351,7 @@
       "image": null
     },
     {
-      "id": "paquete_papas",
+      "id": "67957315-f99a-477b-a94d-fc1de9f14f23",
       "name": "Paquete Papas",
       "description": "Paquete Papas",
       "price": 8000,
@@ -361,7 +361,7 @@
       "image": null
     },
     {
-      "id": "producto_6000",
+      "id": "e89df3f9-2cd7-43b2-ac0c-58d4cfb680dc",
       "name": "Producto 6000",
       "description": "Producto 6000",
       "price": 6000,
@@ -371,7 +371,7 @@
       "image": null
     },
     {
-      "id": "producto_12000",
+      "id": "92c56f3b-881f-4094-b897-c81a50dda68a",
       "name": "Producto 12000",
       "description": "Producto 12000",
       "price": 12000,
@@ -381,7 +381,7 @@
       "image": null
     },
     {
-      "id": "producto_20000",
+      "id": "b48b1899-b91c-4756-9dff-d7f7c42c0f9d",
       "name": "Producto 20000",
       "description": "Producto 20000",
       "price": 20000,
@@ -391,7 +391,7 @@
       "image": null
     },
     {
-      "id": "producto_15000_1",
+      "id": "0e3d0f92-8960-4744-8caf-503ef1705e3f",
       "name": "Producto 15000",
       "description": "Producto 15000",
       "price": 15000,
@@ -401,7 +401,7 @@
       "image": null
     },
     {
-      "id": "producto_15000_2",
+      "id": "e4dcf5d3-42ba-45d9-a469-5727fad5452f",
       "name": "Producto 15000",
       "description": "Producto 15000",
       "price": 15000,
@@ -411,7 +411,7 @@
       "image": null
     },
     {
-      "id": "producto_15000_3",
+      "id": "82d2e026-37a7-49f7-b699-2d86d92c3e61",
       "name": "Producto 15000",
       "description": "Producto 15000",
       "price": 15000,
@@ -421,7 +421,7 @@
       "image": null
     },
     {
-      "id": "producto_11000",
+      "id": "bd74112f-2ed5-4141-97a8-abd41f84f53e",
       "name": "Producto 11000",
       "description": "Producto 11000",
       "price": 11000,
@@ -431,7 +431,7 @@
       "image": null
     },
     {
-      "id": "producto_2500",
+      "id": "bb8a200b-ed30-4314-9039-4ebde73ce669",
       "name": "Producto 2500",
       "description": "Producto 2500",
       "price": 2500,
@@ -441,7 +441,7 @@
       "image": null
     },
     {
-      "id": "producto_7000",
+      "id": "65fe86aa-5d4c-4305-9b49-6aaa38548d65",
       "name": "Producto 7000",
       "description": "Producto 7000",
       "price": 7000,
@@ -451,7 +451,7 @@
       "image": null
     },
     {
-      "id": "producto_4000",
+      "id": "25e50b14-f293-4e16-8b68-9003fcbc408e",
       "name": "Producto 4000",
       "description": "Producto 4000",
       "price": 4000,
@@ -461,7 +461,7 @@
       "image": null
     },
     {
-      "id": "paquete_x12",
+      "id": "91ab0079-2f0f-4344-8910-6ed384df749d",
       "name": "Paquete x12",
       "description": "Paquete x12",
       "price": 28000,
@@ -471,7 +471,7 @@
       "image": null
     },
     {
-      "id": "unidad_x4_chocolates",
+      "id": "67be6801-160f-4bf9-82fd-312a73a4fce0",
       "name": "Unidad x4 Chocolates",
       "description": "Unidad x4 Chocolates",
       "price": 3000,
@@ -481,7 +481,7 @@
       "image": null
     },
     {
-      "id": "unidad_x10_chocolates",
+      "id": "6b4d3cc2-3a15-49ca-be47-0e8713150b12",
       "name": "Unidad x10 Chocolates",
       "description": "Unidad x10 Chocolates",
       "price": 7000,
@@ -491,7 +491,7 @@
       "image": null
     },
     {
-      "id": "chocolatina",
+      "id": "992f2f11-6e99-4668-9503-780c2a7fba3d",
       "name": "Chocolatina",
       "description": "Chocolatina",
       "price": 7000,
@@ -501,7 +501,7 @@
       "image": null
     },
     {
-      "id": "cafe_125g",
+      "id": "721ad865-30c1-48e7-9980-436ebefa14d3",
       "name": "Café 125g",
       "description": "Café 125g",
       "price": 15000,
@@ -511,7 +511,7 @@
       "image": null
     },
     {
-      "id": "cafe_250g",
+      "id": "d6e9ef11-2c7b-446f-ac55-ee185c023adb",
       "name": "Café 250g",
       "description": "Café 250g",
       "price": 24000,
@@ -521,7 +521,7 @@
       "image": null
     },
     {
-      "id": "cafe_500g",
+      "id": "6364c60f-bcbc-4eff-a88d-ae90737edc8b",
       "name": "Café 500g",
       "description": "Café 500g",
       "price": 42000,

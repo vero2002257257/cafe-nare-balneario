@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer');
+const { ThermalPrinter } = require('node-thermal-printer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
@@ -13,6 +14,7 @@ const fetch = require('node-fetch');
 // Import data handlers
 const ExcelHandler = require('./handlers/excelHandler');
 const GoogleSheetsHandler = require('./handlers/googleSheetsHandler');
+const PrinterHandler = require('./handlers/printerHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -77,6 +79,18 @@ function getLocalIP() {
 // Choose data handler based on environment variable or default to Excel
 const useGoogleSheets = process.env.USE_GOOGLE_SHEETS === 'true';
 const dataHandler = useGoogleSheets ? googleSheetsHandler : excelHandler;
+
+// Initialize printer handler (only if printing is enabled)
+let printerHandler = null;
+try {
+    if (process.env.ENABLE_PRINTING === 'true') {
+        const PrinterHandler = require('./handlers/printerHandler');
+        printerHandler = new PrinterHandler();
+        console.log('Printer handler initialized successfully');
+    }
+} catch (error) {
+    console.error('Error initializing printer handler:', error);
+}
 
 console.log(`Using ${useGoogleSheets ? 'Google Sheets' : 'Excel'} as data storage`);
 
@@ -336,7 +350,7 @@ app.get('/api/sales/:id', async (req, res) => {
 
 app.post('/api/sales', async (req, res) => {
     try {
-        const { customerId, customerName, items } = req.body;
+        const { customerId, customerName, items, print } = req.body;
 
         // Validate sale data
         if (!items || !Array.isArray(items) || items.length === 0) {
@@ -355,6 +369,16 @@ app.post('/api/sales', async (req, res) => {
             date: new Date().toISOString(),
             createdAt: new Date().toISOString()
         };
+
+        // Print receipt if requested and printing is enabled
+        if (print && printerHandler) {
+            try {
+                await printerHandler.printReceipt(saleData);
+            } catch (printError) {
+                console.error('Error printing receipt:', printError);
+                // Continue with sale even if printing fails
+            }
+        }
 
         // Process the sale
         const result = await dataHandler.addSale(saleData);

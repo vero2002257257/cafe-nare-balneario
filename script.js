@@ -319,6 +319,9 @@ async function loadProducts() {
     try {
         products = await apiCall('/products');
         
+        // Siempre sincronizar allProducts con products
+        allProducts = [...products]; // Usar los productos tal como están, manteniendo sus categorías originales
+        
         // Si la API devuelve menos de 10 productos, cargar productos locales
         if (products.length < 10) {
             await loadLocalProducts();
@@ -337,7 +340,23 @@ async function loadLocalProducts() {
         
         if (response.ok) {
             const data = await response.json();
-            products = data.products || [];
+            const localProducts = data.products || [];
+            
+            // Intentar agregar cada producto local a la base de datos si no existe
+            for (const product of localProducts) {
+                try {
+                    await apiCall('/products', 'POST', {
+                        ...product,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                } catch (error) {
+                    console.warn(`No se pudo agregar el producto ${product.name}:`, error);
+                }
+            }
+            
+            // Recargar productos desde la base de datos
+            products = await apiCall('/products');
         } else {
             throw new Error(`No se pudo cargar el archivo de productos. Status: ${response.status}`);
         }
@@ -2371,13 +2390,8 @@ function generatePrintDocument(saleData, customerData = null) {
 function renderVentaRapidaProducts(category = 'all') {
     currentCategory = category;
     
-    // Si no tenemos productos cargados, los cargamos
-    if (allProducts.length === 0) {
-        allProducts = products.map(product => ({
-            ...product,
-            category: determineProductCategory(product.name)
-        }));
-    }
+    // Siempre sincronizar con los productos actuales
+    allProducts = [...products]; // Usar los productos tal como están, manteniendo sus categorías originales
     
     let productsToShow = allProducts;
     
@@ -2604,7 +2618,7 @@ function cancelarVentaRapida() {
 }
 
 // Función para completar venta rápida
-async function completarVentaRapida() {
+async function completarVentaRapida(shouldPrint = false) {
     if (!window.currentSale || window.currentSale.items.length === 0) {
         showToast('Agrega al menos un producto a la venta', 'warning');
         return;
@@ -2614,7 +2628,8 @@ async function completarVentaRapida() {
         customerId: null,
         customerName: 'Cliente General',
         items: window.currentSale.items,
-        total: window.currentSale.total
+        total: window.currentSale.total,
+        print: shouldPrint
     };
     
     showLoading();
@@ -2809,9 +2824,8 @@ function getProductCategoryIcon(category) {
 function setupVentaRapidaEventListeners() {
     const searchInput = document.getElementById('ventaRapidaSearch');
     const cancelarBtn = document.getElementById('cancelarVentaRapida');
-    const venderBtn = document.getElementById('venderRapida');
-    const completarBtn = document.getElementById('completarVentaRapida');
-    const probarImpresionBtn = document.getElementById('probarImpresionRapida');
+    const venderSinImprimirBtn = document.getElementById('venderSinImprimir');
+    const venderEImprimirBtn = document.getElementById('venderEImprimir');
     
     if (searchInput) {
         searchInput.addEventListener('input', filterVentaRapidaProducts);
@@ -2824,16 +2838,12 @@ function setupVentaRapidaEventListeners() {
         });
     }
     
-    if (venderBtn) {
-        venderBtn.addEventListener('click', venderRapida);
+    if (venderSinImprimirBtn) {
+        venderSinImprimirBtn.addEventListener('click', () => completarVentaRapida(false));
     }
     
-    if (completarBtn) {
-        completarBtn.addEventListener('click', completarVentaRapida);
-    }
-    
-    if (probarImpresionBtn) {
-        probarImpresionBtn.addEventListener('click', probarImpresionVentaRapida);
+    if (venderEImprimirBtn) {
+        venderEImprimirBtn.addEventListener('click', () => completarVentaRapida(true));
     }
     
     // Configurar pestañas de categorías

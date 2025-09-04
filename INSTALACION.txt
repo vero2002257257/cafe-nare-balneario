@@ -120,3 +120,39 @@ No abre la aplicación:
 ¡Disfruta tu nuevo sistema de gestión! ☕✨
 
 ============================================================
+
+# Instalación y configuración del proyecto
+
+## Requisitos previos
+- Node.js v18.x
+- npm v9.x
+
+## Instalación de dependencias
+
+1. Abre una terminal en la carpeta del proyecto.
+2. Ejecuta:
+   ```powershell
+   npm install
+   ```
+
+Esto instalará todas las dependencias necesarias.
+
+## Variables de entorno
+
+- Copia el archivo `env.example` y renómbralo como `.env`.
+- Completa los valores necesarios en `.env` según tu configuración.
+
+## Ejecución del proyecto
+
+- Para iniciar el servidor:
+  ```powershell
+  npm start
+  ```
+- Para desarrollo (con recarga automática):
+  ```powershell
+  npm run dev
+  ```
+
+## Notas adicionales
+- Si necesitas conectarte a Google Sheets, revisa la configuración en `data/` y los scripts en `scripts/`.
+- Consulta los archivos `README.md` y las guías para más detalles sobre funcionalidades específicas.
