@@ -132,17 +132,21 @@ style.innerHTML = `
 @media (max-width: 600px) {
   #ventaRapidaPanel {
     position: fixed !important;
-    top: 60px !important;
+    bottom: 0 !important;
+    left: 0 !important;
     right: 0 !important;
-    width: 100vw !important;
-    height: 60vh !important;
-    max-width: 100vw !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 40vh !important;
+    max-width: 100% !important;
     border-left: none !important;
     border-top: 2px solid #8B4513 !important;
-    border-radius: 0 0 12px 12px !important;
-    box-shadow: 0 -2px 20px rgba(0,0,0,0.10);
-    z-index: 3000 !important;
+    border-radius: 12px 12px 0 0 !important;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
+    z-index: 9999 !important;
     overflow-y: auto !important;
+    background: white !important;
   }
 }`;
 document.head.appendChild(style);
@@ -2575,7 +2579,7 @@ function renderVentaRapidaProductsFiltered(productsToShow) {
                 <div class="product-details">
                     <span class="product-price">${formatCurrency(product.price)}</span>
                     <span class="product-stock ${product.stock <= product.minStock ? 'stock-low' : ''}">
-                        ${product.stock} disponibles
+                        ${product.stock}
                     </span>
                 </div>
                 <div class="add-to-cart">
