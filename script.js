@@ -110,6 +110,43 @@ function setupEventListeners() {
     setupVentaRapidaEventListeners();
 }
 
+/* Ajuste de panel de venta rápida para vista lateral y compacta */
+const ventaRapidaPanel = document.getElementById('ventaRapidaPanel');
+if (ventaRapidaPanel) {
+    ventaRapidaPanel.style.position = 'fixed';
+    ventaRapidaPanel.style.top = '80px';
+    ventaRapidaPanel.style.right = '0';
+    ventaRapidaPanel.style.width = '320px';
+    ventaRapidaPanel.style.height = 'calc(100vh - 100px)';
+    ventaRapidaPanel.style.overflowY = 'auto';
+    ventaRapidaPanel.style.background = '#fff';
+    ventaRapidaPanel.style.boxShadow = '0 0 20px rgba(0,0,0,0.12)';
+    ventaRapidaPanel.style.zIndex = '2000';
+    ventaRapidaPanel.style.borderLeft = '2px solid #8B4513';
+    ventaRapidaPanel.style.display = 'none'; // Se muestra solo cuando hay venta
+}
+
+// Ajuste responsivo para el panel de venta rápida en mobile
+const style = document.createElement('style');
+style.innerHTML = `
+@media (max-width: 600px) {
+  #ventaRapidaPanel {
+    position: fixed !important;
+    top: 60px !important;
+    right: 0 !important;
+    width: 100vw !important;
+    height: 60vh !important;
+    max-width: 100vw !important;
+    border-left: none !important;
+    border-top: 2px solid #8B4513 !important;
+    border-radius: 0 0 12px 12px !important;
+    box-shadow: 0 -2px 20px rgba(0,0,0,0.10);
+    z-index: 3000 !important;
+    overflow-y: auto !important;
+  }
+}`;
+document.head.appendChild(style);
+
 // Navigation Functions
 function toggleSidebar() {
     sidebar.classList.toggle('open');
@@ -2037,21 +2074,23 @@ function generatePrintDocument(saleData, customerData = null) {
                     padding: 10px;
                     background: white;
                 }
+                .ticket-header {
+                    text-align: center;
+                    border-bottom: 2px solid #8B4513;
+                    padding-bottom: 10px;
+                    margin-bottom: 10px;
+                }
                 .ticket-title {
-                    font-size: 18px;
                     font-weight: bold;
+                    font-size: 16px;
                     margin: 0;
                 }
-                .ticket-subtitle {
-                    font-size: 14px;
-                    margin: 5px 0;
-                }
                 .ticket-info {
-                    margin: 10px 0;
-                    font-size: 13px;
+                    margin: 5px 0;
+                    font-size: 12px;
                 }
                 .ticket-items {
-                    margin: 15px 0;
+                    margin: 10px 0;
                 }
                 .item-row {
                     display: flex;
@@ -2061,16 +2100,17 @@ function generatePrintDocument(saleData, customerData = null) {
                     padding-bottom: 3px;
                 }
                 .ticket-total {
-                    border-top: 2px solid #000;
-                    margin-top: 15px;
+                    border-top: 2px solid #8B4513;
+                    margin-top: 10px;
                     padding-top: 10px;
                     font-weight: bold;
+                    font-size: 14px;
                 }
                 .ticket-footer {
                     text-align: center;
-                    margin-top: 20px;
+                    margin-top: 15px;
                     font-size: 10px;
-                    border-top: 1px solid #000;
+                    border-top: 1px solid #8B4513;
                     padding-top: 10px;
                 }
             </style>
@@ -2079,7 +2119,7 @@ function generatePrintDocument(saleData, customerData = null) {
             <!-- El botón de imprimir ha sido eliminado para que solo aparezca el diálogo de impresión por defecto -->
             <div class="ticket-header">
                 <h1 class="ticket-title">CAFÉ NARE BALNEARIO</h1>
-                <p class="ticket-subtitle">Café</p>
+                <p class="ticket-subtitle">Cafetería</p>
                 <p class="ticket-subtitle">Balneario Alejandrino</p>
                 <p class="ticket-subtitle">Tel: 3128946326</p>
             </div>
@@ -2100,12 +2140,11 @@ function generatePrintDocument(saleData, customerData = null) {
             </div>
             <div class="ticket-footer">
                 <p>¡Gracias por su visita!</p>
-                <p>Vuelva pronto pronto</p>
+                <p>Vuelva pronto</p>
                 <p>Instagram: </p>
                 <p>cafenare.alejandrino </p>
             </div>
-        </body>
-        </html>
+        </div>
     `;
     
     printWindow.document.write(printContent);
