@@ -2627,7 +2627,13 @@ async function completarVentaRapida(shouldPrint = false) {
     const saleData = {
         customerId: null,
         customerName: 'Cliente General',
-        items: window.currentSale.items,
+        items: window.currentSale.items.map(item => ({
+            productId: item.productId,
+            productName: item.name,
+            name: item.name,
+            price: parseFloat(item.price),
+            quantity: parseInt(item.quantity)
+        })),
         total: window.currentSale.total,
         print: shouldPrint
     };
@@ -2635,7 +2641,7 @@ async function completarVentaRapida(shouldPrint = false) {
     showLoading();
     try {
         // Registrar venta en el backend
-        await apiCall('/sales', 'POST', saleData);
+        const result = await apiCall('/sales', 'POST', saleData);
         
         // Actualizar stock local
         window.currentSale.items.forEach(item => {
@@ -2650,14 +2656,21 @@ async function completarVentaRapida(shouldPrint = false) {
         
         if (loyverseResult) {
             showToast('Venta registrada y enviada a Loyverse ✓', 'success');
-            // Con Loyverse configurado, la impresión será automática
-            showToast('Ticket enviado a impresora automáticamente 🖨️', 'info');
         } else {
             showToast('Venta registrada correctamente ✓', 'success');
-            
-            // Generar documento de impresión automáticamente
-            generatePrintDocument(saleData);
-            showToast('Documento de impresión generado. Selecciona tu impresora preferida.', 'success');
+        }
+        
+        if (shouldPrint && result.receiptHtml) {
+            // Crear un nuevo documento para la impresión
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(result.receiptHtml);
+            printWindow.document.close();
+            // Esperar a que los estilos se carguen
+            setTimeout(() => {
+                printWindow.print();
+                // Cerrar la ventana después de imprimir
+                printWindow.close();
+            }, 500);
         }
         
         // Limpiar venta

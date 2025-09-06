@@ -364,16 +364,23 @@ app.post('/api/sales', async (req, res) => {
             id: uuidv4(),
             customerId: customerId || null,
             customerName: customerName || 'Cliente General',
-            items: items,
+            items: items.map(item => ({
+                ...item,
+                name: item.productName || item.name, // Asegurarnos de que tenemos el nombre del producto
+                price: parseFloat(item.price),
+                quantity: parseInt(item.quantity)
+            })),
             total: total,
             date: new Date().toISOString(),
             createdAt: new Date().toISOString()
         };
 
         // Print receipt if requested and printing is enabled
+        let receiptHtml = null;
         if (print && printerHandler) {
             try {
-                await printerHandler.printReceipt(saleData);
+                const printResult = await printerHandler.printReceipt(saleData);
+                receiptHtml = printResult.html;
             } catch (printError) {
                 console.error('Error printing receipt:', printError);
                 // Continue with sale even if printing fails
@@ -393,7 +400,10 @@ app.post('/api/sales', async (req, res) => {
             await dataHandler.updateCustomerStats(customerId, total);
         }
 
-        res.status(201).json(result);
+        res.status(201).json({
+            ...result,
+            receiptHtml: receiptHtml
+        });
     } catch (error) {
         console.error('Error creating sale:', error);
         res.status(500).json({ error: 'Error al procesar venta' });
