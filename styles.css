@@ -1,3 +1,13 @@
+/* Solo mostrar el ticket al imprimir */
+@media print {
+    body *:not(#ticketPrintContainer) {
+        display: none !important;
+    }
+    #ticketPrintContainer {
+        display: block !important;
+        position: static !important;
+    }
+}
 /* CSS Variables for Coffee Theme */
 :root {
     --primary-brown: #8B4513;

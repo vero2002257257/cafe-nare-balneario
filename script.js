@@ -42,19 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
 async function initializeApp() {
     showLoading();
     try {
-        // Cargar configuración de Loyverse
-        loadLoyverseConfig();
-        
-        await loadProducts();
-        await loadCustomers();
-        await loadSales();
-        updateDashboard();
-        showToast('Aplicación cargada correctamente', 'success');
-        
-        // Mostrar estado de Loyverse si está en modo admin (sin prompts automáticos)
-        if (isAdminMode && LOYVERSE_CONFIG.enabled) {
-            showToast('Loyverse integrado ✓', 'info');
-        }
+    await loadProducts();
+    await loadCustomers();
+    await loadSales();
+    updateDashboard();
+    showToast('Aplicación cargada correctamente', 'success');
     } catch (error) {
         console.error('Error initializing app:', error);
         showToast('Error al cargar la aplicación', 'error');
@@ -1849,8 +1841,6 @@ function printTicketPreview() {
                 .ticket-title {
                     font-weight: bold;
                     font-size: 14px;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
                 }
                 .ticket-info {
                     margin: 10px 0;
@@ -1874,7 +1864,7 @@ function printTicketPreview() {
                     font-size: 13px;
                     margin-top: 10px;
                     border-top: 1px dashed #8B4513;
-                    padding-top: 5px;
+                    padding-top: 10px;
                 }
                 .ticket-footer {
                     text-align: center;
@@ -1922,125 +1912,6 @@ function printTicketPreview() {
     
     newWindow.document.close();
 }
-
-function closeTicketModal() {
-    document.getElementById('ticketModal').classList.remove('active');
-}
-
-// ===== PRINTER CONFIGURATION =====
-
-// Configuración del servicio de impresión
-const PRINT_SERVICE = {
-    url: 'http://localhost:18080',
-    token: 'SECRETO_123'
-};
-
-// Función para enviar ticket a la impresora térmica
-async function printToThermalPrinter(saleData, customerData = null) {
-    try {
-        const ticketJson = {
-            header: {
-                title: 'Café Nare - Balneario',
-                invoice: saleData.id || Date.now().toString(),
-                datetime: new Date().toLocaleString('es-CO'),
-                cashier: 'Cajero'
-            },
-            items: saleData.items.map(item => ({
-                name: item.productName,
-                qty: item.quantity,
-                price: item.price
-            })),
-            totals: {
-                subtotal: saleData.total,
-                iva: Math.round(saleData.total * 0.19),
-                total: Math.round(saleData.total * 1.19)
-            },
-            footer: {
-                pay: 'Efectivo',
-                change: 0,
-                message: '¡Gracias por su compra!'
-            }
-        };
-
-        const response = await fetch(`${PRINT_SERVICE.url}/print`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Print-Token': PRINT_SERVICE.token
-            },
-            body: JSON.stringify(ticketJson)
-        });
-
-        const result = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(result.error || 'Error al imprimir');
-        }
-
-        showToast('Ticket enviado a la impresora ✓', 'success');
-        return true;
-    } catch (error) {
-        console.error('Error en impresión térmica:', error);
-        showToast('Error al imprimir. Mostrando vista previa...', 'warning');
-        printTicketPreview();
-        return false;
-    }
-}
-
-// Función para verificar estado de la impresora
-async function checkPrinterStatus() {
-    try {
-        const response = await fetch(`${PRINT_SERVICE.url}/status`, {
-            headers: {
-                'X-Print-Token': PRINT_SERVICE.token
-            }
-        });
-
-        const result = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(result.error || 'Error al verificar impresora');
-        }
-
-        return result.printer;
-    } catch (error) {
-        console.error('Error verificando impresora:', error);
-        return null;
-    }
-}
-
-// Initialize ticket modal events
-document.addEventListener('DOMContentLoaded', function() {
-    const ticketModal = document.getElementById('ticketModal');
-    const closeBtn = document.getElementById('closeTicket');
-    
-    if (closeBtn) {
-        closeBtn.onclick = closeTicketModal;
-    }
-    
-    if (ticketModal) {
-        window.onclick = function(event) {
-            if (event.target == ticketModal) {
-                closeTicketModal();
-            }
-        }
-    }
-    
-    // Función de prueba para el modal (puedes ejecutarla desde la consola)
-    window.testTicketModal = function() {
-        const testData = {
-            items: [
-                { productName: 'Café Americano', quantity: 2, price: 3500 },
-                { productName: 'Croissant', quantity: 1, price: 2500 }
-            ],
-            total: 9500
-        };
-        showTicket(testData, { name: 'Cliente de Prueba' });
-        console.log('Modal de prueba abierto. Verifica que sea visible.');
-    };
-    
-    console.log('Modal del ticket inicializado. Usa testTicketModal() para probar.');
-})
 
 // Función para generar documento de impresión automática
 // Función para probar impresión con datos actuales de la venta
@@ -2166,33 +2037,22 @@ function generatePrintDocument(saleData, customerData = null) {
                     padding: 10px;
                     background: white;
                 }
-                
-                .ticket-header {
-                    text-align: center;
-                    border-bottom: 2px solid #000;
-                    padding-bottom: 10px;
-                    margin-bottom: 15px;
-                }
-                
                 .ticket-title {
                     font-size: 18px;
                     font-weight: bold;
                     margin: 0;
                 }
-                
                 .ticket-subtitle {
                     font-size: 14px;
                     margin: 5px 0;
                 }
-                
                 .ticket-info {
                     margin: 10px 0;
+                    font-size: 13px;
                 }
-                
                 .ticket-items {
                     margin: 15px 0;
                 }
-                
                 .item-row {
                     display: flex;
                     justify-content: space-between;
@@ -2200,14 +2060,12 @@ function generatePrintDocument(saleData, customerData = null) {
                     border-bottom: 1px dotted #ccc;
                     padding-bottom: 3px;
                 }
-                
                 .ticket-total {
                     border-top: 2px solid #000;
                     margin-top: 15px;
                     padding-top: 10px;
                     font-weight: bold;
                 }
-                
                 .ticket-footer {
                     text-align: center;
                     margin-top: 20px;
@@ -2215,61 +2073,31 @@ function generatePrintDocument(saleData, customerData = null) {
                     border-top: 1px solid #000;
                     padding-top: 10px;
                 }
-                
-                .print-button {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #007bff;
-                    color: white;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    font-size: 16px;
-                }
-                
-                .print-button:hover {
-                    background: #0056b3;
-                }
             </style>
         </head>
         <body>
-            <button class="print-button no-print" onclick="window.print()">
-                🖨️ Imprimir
-            </button>
-            
+            <!-- El botón de imprimir ha sido eliminado para que solo aparezca el diálogo de impresión por defecto -->
             <div class="ticket-header">
                 <h1 class="ticket-title">CAFÉ NARE BALNEARIO</h1>
                 <p class="ticket-subtitle">Restaurante y Bar</p>
                 <p class="ticket-subtitle">Dirección del Local</p>
                 <p class="ticket-subtitle">Tel: (123) 456-7890</p>
             </div>
-            
             <div class="ticket-info">
-                <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
-                <p><strong>Hora:</strong> ${new Date().toLocaleTimeString('es-ES')}</p>
-                <p><strong>Ticket #:</strong> ${saleData.receipt_number || 'N/A'}</p>
-                ${customerData ? `<p><strong>Cliente:</strong> ${customerData.name || 'Cliente General'}</p>` : ''}
+                <p style='font-size:13px;'><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
+                <p style='font-size:13px;'><strong>Hora:</strong> ${new Date().toLocaleTimeString('es-ES')}</p>
+                <p style='font-size:13px;'><strong>Ticket #:</strong> ${saleData.id || 'N/A'}</p>
             </div>
-            
             <div class="ticket-items">
-                <h3>ITEMS:</h3>
-                ${convertedData.items.map(item => `
-                    <div class="item-row">
-                        <span>${item.quantity}x ${item.productName}</span>
-                        <span>$${item.price.toFixed(2)}</span>
-                    </div>
-                `).join('')}
+                <h3 style='font-size:14px;'>ITEMS:</h3>
+                ${itemsHtml}
             </div>
-            
             <div class="ticket-total">
-                <div class="item-row">
-                    <span><strong>TOTAL:</strong></span>
-                    <span><strong>$${convertedData.total.toFixed(2)}</strong></span>
+                <div style='display:flex;justify-content:space-between;width:100%;font-size:15px;'>
+                    <span style="flex:1;text-align:left;"><strong>TOTAL:</strong></span>
+                    <span style="flex:1;text-align:right;"><strong>$${saleData.total.toFixed(2)}</strong></span>
                 </div>
             </div>
-            
             <div class="ticket-footer">
                 <p>¡Gracias por su visita!</p>
                 <p>Esperamos verlo pronto</p>
@@ -2290,7 +2118,6 @@ function generatePrintDocument(saleData, customerData = null) {
     
     return printWindow;
 }
-;
 
 // ===== FUNCIONES DE VENTA RÁPIDA =====
 
@@ -2316,34 +2143,44 @@ function determineProductCategory(productName) {
     const name = productName.toLowerCase();
     
     // Bebidas Café
-    if (name.includes('café') || name.includes('cafe') || name.includes('capuccino') || name.includes('mocacino') ||
+    if (
+        name.includes('café') || name.includes('cafe') || name.includes('capuccino') || name.includes('mocacino') ||
         name.includes('latte') || name.includes('americano') || name.includes('expresso') || name.includes('aromatica') ||
-        name.includes('chocolate') || name.includes('jugo')) {
+        name.includes('jugo')
+    ) {
         return 'bebidas';
-    } 
+    }
     // Cervezas
-    else if (name.includes('cerveza') || name.includes('budweiser') || name.includes('pilsen') || name.includes('bitburger') ||
-             name.includes('bbc') || name.includes('club colombia') || name.includes('aguila') || name.includes('corona') ||
-             name.includes('stella') || name.includes('heineken') || name.includes('redds') || name.includes('peroni') ||
-             name.includes('andina')) {
+    else if (
+        name.includes('cerveza') || name.includes('budweiser') || name.includes('pilsen') || name.includes('bitburger') ||
+        name.includes('bbc') || name.includes('club colombia') || name.includes('aguila') || name.includes('corona') ||
+        name.includes('stella') || name.includes('heineken') || name.includes('redds') || name.includes('peroni') ||
+        name.includes('andina')
+    ) {
         return 'cervezas';
-    } 
+    }
     // Líquidos
-    else if (name.includes('hidra') || name.includes('gatorade') || name.includes('electrolit') || name.includes('four loko') ||
-             name.includes('jp') || name.includes('cuba libre') || name.includes('smirnoff') || name.includes('redbull') ||
-             name.includes('agua') || name.includes('hatsu') || name.includes('te')) {
+    else if (
+        name.includes('hidra') || name.includes('gatorade') || name.includes('electrolit') || name.includes('four loko') ||
+        name.includes('jp') || name.includes('cuba libre') || name.includes('smirnoff') || name.includes('redbull') ||
+        name.includes('agua') || name.includes('hatsu') || name.includes('te')
+    ) {
         return 'liquidos';
-    } 
+    }
     // Snacks
-    else if (name.includes('papas') || name.includes('chips') || name.includes('snack')) {
+    else if (
+        name.includes('papas') || name.includes('chips') || name.includes('snack')
+    ) {
         return 'snacks';
-    } 
+    }
     // Chocolates-Café
-    else if (name.includes('chocolate') || name.includes('chocolatina') || name.includes('café 125g') || 
-             name.includes('café 250g') || name.includes('café 500g') || name.includes('paquete x12') ||
-             name.includes('unidad x4') || name.includes('unidad x10')) {
+    else if (
+        name.includes('chocolate') || name.includes('chocolatina') || name.includes('café 125g') ||
+        name.includes('café 250g') || name.includes('café 500g') || name.includes('paquete x12') ||
+        name.includes('unidad x4') || name.includes('unidad x10')
+    ) {
         return 'chocolates_cafe';
-    } 
+    }
     else {
         return 'otros';
     }
@@ -2531,26 +2368,16 @@ async function completarVentaRapida(shouldPrint = false) {
         showToast('Agrega al menos un producto a la venta', 'warning');
         return;
     }
-    
     const saleData = {
         customerId: null,
         customerName: 'Cliente General',
-        items: window.currentSale.items.map(item => ({
-            productId: item.productId,
-            productName: item.name,
-            name: item.name,
-            price: parseFloat(item.price),
-            quantity: parseInt(item.quantity)
-        })),
-        total: window.currentSale.total,
-        print: shouldPrint
+        items: window.currentSale.items,
+        total: window.currentSale.total
     };
-    
     showLoading();
     try {
         // Registrar venta en el backend
-        const result = await apiCall('/sales', 'POST', saleData);
-        
+        await apiCall('/sales', 'POST', saleData);
         // Actualizar stock local
         window.currentSale.items.forEach(item => {
             const product = products.find(p => p.id === item.productId);
@@ -2558,30 +2385,29 @@ async function completarVentaRapida(shouldPrint = false) {
                 product.stock -= item.quantity;
             }
         });
-        
         showToast('Venta registrada correctamente ✓', 'success');
-        
-        if (shouldPrint && result.receiptHtml) {
-            // Crear un nuevo documento para la impresión
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(result.receiptHtml);
-            printWindow.document.close();
-            // Esperar a que los estilos se carguen
+        if (shouldPrint) {
+            let iframe = document.getElementById('ticketPrintIframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'ticketPrintIframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+            const ticketHtml = generateTicketHtml(window.currentSale);
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(ticketHtml);
+            doc.close();
             setTimeout(() => {
-                printWindow.print();
-                // Cerrar la ventana después de imprimir
-                printWindow.close();
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
             }, 500);
         }
-        
-        // Limpiar venta
         cancelarVentaRapida();
         renderSales();
         updateDashboard();
-        
-        // Actualizar la vista de productos para mostrar el nuevo stock
         renderVentaRapidaProducts(currentCategory);
-        
     } catch (error) {
         showToast('Error al registrar la venta', 'error');
     } finally {
@@ -2766,6 +2592,48 @@ function setupCategoryTabs() {
             changeCategory(category);
         });
     });
+}
+
+// Nueva función para generar el HTML del ticket
+function generateTicketHtml(saleData) {
+    const itemsHtml = (saleData.items && saleData.items.length > 0)
+        ? saleData.items.map(item => `
+            <div style='display:flex;justify-content:space-between;'>
+                <span>${item.quantity}x ${item.productName || item.name}</span>
+                <span>$${item.price ? item.price.toFixed(2) : 0}</span>
+            </div>
+        `).join('')
+        : '<div>No hay productos en la venta</div>';
+    return `
+    <div style='font-family:Verdana,Arial,Helvetica,sans-serif;font-size:14px;padding:10px;max-width:500px;width:100%;margin:auto;'>
+            <div style='text-align:center;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:15px;'>
+                <h1 style='font-size:20px;font-weight:bold;margin:0;'>CAFÉ NARE BALNEARIO</h1>
+                <p style='font-size:15px;font-weight:bold;margin:5px 0;'>Restaurante y Bar</p>
+                <p style='font-size:15px;margin:5px 0;'>Dirección del Local</p>
+                <p style='font-size:15px;margin:5px 0;'>Tel: (123) 456-7890</p>
+            </div>
+            <div style='margin:10px 0;'>
+                <p style='font-size:13px;'><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
+                <p style='font-size:13px;'><strong>Hora:</strong> ${new Date().toLocaleTimeString('es-ES')}</p>
+                <p style='font-size:13px;'><strong>Ticket #:</strong> ${saleData.id || 'N/A'}</p>
+            </div>
+            <div style='margin:15px 0;'>
+                <h3 style='font-size:14px;'>ITEMS:</h3>
+                ${itemsHtml}
+            </div>
+            <div style='border-top:2px solid #000;margin-top:15px;padding-top:10px;font-weight:bold;'>
+                <div style='display:flex;justify-content:space-between;width:100%;font-size:15px;'>
+                    <span style="flex:1;text-align:left;"><strong>TOTAL:</strong></span>
+                    <span style="flex:1;text-align:right;"><strong>$${saleData.total.toFixed(2)}</strong></span>
+                </div>
+            </div>
+            <div style='text-align:center;margin-top:20px;font-size:13px;border-top:1px solid #000;padding-top:10px;'>
+                <p>¡Gracias por su visita!</p>
+                <p>Esperamos verlo pronto</p>
+                <p>www.cafenarebalneario.com</p>
+            </div>
+        </div>
+    `;
 }
 
 
