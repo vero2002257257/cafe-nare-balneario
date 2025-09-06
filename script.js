@@ -1929,7 +1929,85 @@ function closeTicketModal() {
 
 // ===== PRINTER CONFIGURATION =====
 
-// La configuración de impresión ahora es local
+// Configuración del servicio de impresión
+const PRINT_SERVICE = {
+    url: 'http://localhost:18080',
+    token: 'SECRETO_123'
+};
+
+// Función para enviar ticket a la impresora térmica
+async function printToThermalPrinter(saleData, customerData = null) {
+    try {
+        const ticketJson = {
+            header: {
+                title: 'Café Nare - Balneario',
+                invoice: saleData.id || Date.now().toString(),
+                datetime: new Date().toLocaleString('es-CO'),
+                cashier: 'Cajero'
+            },
+            items: saleData.items.map(item => ({
+                name: item.productName,
+                qty: item.quantity,
+                price: item.price
+            })),
+            totals: {
+                subtotal: saleData.total,
+                iva: Math.round(saleData.total * 0.19),
+                total: Math.round(saleData.total * 1.19)
+            },
+            footer: {
+                pay: 'Efectivo',
+                change: 0,
+                message: '¡Gracias por su compra!'
+            }
+        };
+
+        const response = await fetch(`${PRINT_SERVICE.url}/print`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Print-Token': PRINT_SERVICE.token
+            },
+            body: JSON.stringify(ticketJson)
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Error al imprimir');
+        }
+
+        showToast('Ticket enviado a la impresora ✓', 'success');
+        return true;
+    } catch (error) {
+        console.error('Error en impresión térmica:', error);
+        showToast('Error al imprimir. Mostrando vista previa...', 'warning');
+        printTicketPreview();
+        return false;
+    }
+}
+
+// Función para verificar estado de la impresora
+async function checkPrinterStatus() {
+    try {
+        const response = await fetch(`${PRINT_SERVICE.url}/status`, {
+            headers: {
+                'X-Print-Token': PRINT_SERVICE.token
+            }
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Error al verificar impresora');
+        }
+
+        return result.printer;
+    } catch (error) {
+        console.error('Error verificando impresora:', error);
+        return null;
+    }
+}
 
 // Initialize ticket modal events
 document.addEventListener('DOMContentLoaded', function() {
