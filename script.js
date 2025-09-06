@@ -147,6 +147,28 @@ style.innerHTML = `
 }`;
 document.head.appendChild(style);
 
+// Ajuste para mostrar el panel de venta rápida al lado derecho en escritorio
+const styleDesktop = document.createElement('style');
+styleDesktop.innerHTML = `
+@media (min-width: 601px) {
+  #ventaRapidaPanel {
+    position: fixed !important;
+    top: 80px !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 320px !important;
+    height: calc(100vh - 100px) !important;
+    border-left: 2px solid #8B4513 !important;
+    border-right: none !important;
+    border-radius: 12px 0 0 12px !important;
+    box-shadow: 0 0 20px rgba(0,0,0,0.12);
+    z-index: 2000 !important;
+    background: #fff !important;
+    overflow-y: auto !important;
+  }
+}`;
+document.head.appendChild(styleDesktop);
+
 // Navigation Functions
 function toggleSidebar() {
     sidebar.classList.toggle('open');
@@ -2146,17 +2168,6 @@ function generatePrintDocument(saleData, customerData = null) {
             </div>
         </div>
     `;
-    
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    
-    // Auto-abrir diálogo de impresión después de un breve delay
-    setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-    }, 500);
-    
-    return printWindow;
 }
 
 // ===== FUNCIONES DE VENTA RÁPIDA =====
