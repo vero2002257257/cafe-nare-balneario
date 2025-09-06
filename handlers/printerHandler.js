@@ -2,10 +2,10 @@ class PrinterHandler {
     constructor() {
         this.config = {
             businessName: 'CAFÉ NARE BALNEARIO',
-            businessType: 'Restaurante y Bar',
-            address: 'Dirección del Local',
-            phone: 'Tel: (123) 456-7890',
-            website: 'www.cafenarebalneario.com'
+            businessType: 'Cafetería',
+            address: 'Balneario Alejandrino',
+            phone: 'Tel: 3128946326',
+            website: 'cafenare.alejandrino'
         };
     }
 

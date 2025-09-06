@@ -2079,9 +2079,9 @@ function generatePrintDocument(saleData, customerData = null) {
             <!-- El botón de imprimir ha sido eliminado para que solo aparezca el diálogo de impresión por defecto -->
             <div class="ticket-header">
                 <h1 class="ticket-title">CAFÉ NARE BALNEARIO</h1>
-                <p class="ticket-subtitle">Restaurante y Bar</p>
-                <p class="ticket-subtitle">Dirección del Local</p>
-                <p class="ticket-subtitle">Tel: (123) 456-7890</p>
+                <p class="ticket-subtitle">Café</p>
+                <p class="ticket-subtitle">Balneario Alejandrino</p>
+                <p class="ticket-subtitle">Tel: 3128946326</p>
             </div>
             <div class="ticket-info">
                 <p style='font-size:13px;'><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
@@ -2100,8 +2100,9 @@ function generatePrintDocument(saleData, customerData = null) {
             </div>
             <div class="ticket-footer">
                 <p>¡Gracias por su visita!</p>
-                <p>Esperamos verlo pronto</p>
-                <p>www.cafenarebalneario.com</p>
+                <p>Vuelva pronto pronto</p>
+                <p>Instagram: </p>
+                <p>cafenare.alejandrino </p>
             </div>
         </body>
         </html>
@@ -2608,9 +2609,9 @@ function generateTicketHtml(saleData) {
     <div style='font-family:Verdana,Arial,Helvetica,sans-serif;font-size:14px;padding:10px;max-width:500px;width:100%;margin:auto;'>
             <div style='text-align:center;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:15px;'>
                 <h1 style='font-size:20px;font-weight:bold;margin:0;'>CAFÉ NARE BALNEARIO</h1>
-                <p style='font-size:15px;font-weight:bold;margin:5px 0;'>Restaurante y Bar</p>
-                <p style='font-size:15px;margin:5px 0;'>Dirección del Local</p>
-                <p style='font-size:15px;margin:5px 0;'>Tel: (123) 456-7890</p>
+                <p style='font-size:15px;font-weight:bold;margin:5px 0;'>Cafetería</p>
+                <p style='font-size:15px;margin:5px 0;'>Balneario Alejandrino</p>
+                <p style='font-size:15px;margin:5px 0;'>Tel: 3128946326</p>
             </div>
             <div style='margin:10px 0;'>
                 <p style='font-size:13px;'><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
@@ -2629,8 +2630,9 @@ function generateTicketHtml(saleData) {
             </div>
             <div style='text-align:center;margin-top:20px;font-size:13px;border-top:1px solid #000;padding-top:10px;'>
                 <p>¡Gracias por su visita!</p>
-                <p>Esperamos verlo pronto</p>
-                <p>www.cafenarebalneario.com</p>
+                <p>Vuelva pronto</p>
+                <p>Instagram: </p>
+                <p>cafenare.alejandrino </p>
             </div>
         </div>
     `;
