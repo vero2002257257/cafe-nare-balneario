@@ -96,7 +96,7 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    width: 280px;
+    width: 208px;
     height: 100vh;
     background: linear-gradient(180deg, var(--light-brown) 0%, var(--beige) 100%);
     padding: 6rem 0 2rem;
