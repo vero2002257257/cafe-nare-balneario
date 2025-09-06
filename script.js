@@ -20,13 +20,7 @@ let allProducts = [];
 // API Base URL - works both locally and on Railway
 const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 
-// Loyverse API Configuration
-const LOYVERSE_CONFIG = {
-    baseUrl: 'https://api.loyverse.com/v1.0',
-    accessToken: '', // Se configurará desde el panel admin
-    storeId: '', // Se configurará desde el panel admin
-    enabled: false
-};
+// Configuración de impresión local
 
 // DOM Elements
 const sidebar = document.getElementById('sidebar');
@@ -87,11 +81,7 @@ function setupEventListeners() {
         downloadExcelBtn.addEventListener('click', downloadExcelData);
     }
 
-    // Configure Loyverse Button
-    const configureLoyverseBtn = document.getElementById('configureLoyverseBtn');
-    if (configureLoyverseBtn) {
-        configureLoyverseBtn.addEventListener('click', configureLoyverse);
-    }
+    // Configuración local de impresión
 
     // Admin Toggle Button
     const adminToggle = document.getElementById('adminToggle');
@@ -809,25 +799,16 @@ async function completeSale() {
         // Registrar venta en nuestro sistema
         await apiCall('/sales', 'POST', saleData);
         
-        // Enviar a Loyverse API si está configurado
-        const loyverseResult = await sendToLoyverse(saleData, customer);
+        showToast('Venta registrada correctamente ✓', 'success');
         
-        if (loyverseResult) {
-            showToast('Venta registrada y enviada a Loyverse ✓', 'success');
-            // Con Loyverse configurado, la impresión será automática
-            showToast('Ticket enviado a impresora automáticamente 🖨️', 'info');
-        } else {
-            showToast('Venta registrada correctamente ✓', 'success');
-            
-            // Solo mostrar opción manual si Loyverse no está configurado
-            setTimeout(() => {
-                if (confirm('¿Desea imprimir el ticket para el cliente?')) {
-                    // Generar documento de impresión automáticamente
-                    generatePrintDocument(saleData, customer);
-                    showToast('Documento de impresión generado. Selecciona tu impresora preferida.', 'success');
-                }
-            }, 500);
-        }
+        // Preguntar si desea imprimir el ticket
+        setTimeout(() => {
+            if (confirm('¿Desea imprimir el ticket para el cliente?')) {
+                // Generar documento de impresión automáticamente
+                generatePrintDocument(saleData, customer);
+                showToast('Documento de impresión generado. Selecciona tu impresora preferida.', 'success');
+            }
+        }, 500);
         
         cancelSale();
         renderSales();
@@ -1946,160 +1927,9 @@ function closeTicketModal() {
     document.getElementById('ticketModal').classList.remove('active');
 }
 
-// ===== LOYVERSE API INTEGRATION =====
+// ===== PRINTER CONFIGURATION =====
 
-// Configurar Loyverse desde el panel admin
-async function configureLoyverse() {
-    if (!isAdminMode) {
-        showToast('Acceso denegado. Activa modo administrador primero.', 'error');
-        return;
-    }
-    
-    // Verificar que estamos en la ventana activa
-    if (document.hidden) {
-        showToast('Por favor asegúrate de que esta pestaña esté activa', 'warning');
-        return;
-    }
-    
-    const accessToken = prompt('Ingresa el Access Token de Loyverse API:\n\nEjemplo: 99c19a699e2045c9bc349176da3f7e4f');
-    
-    if (accessToken && accessToken.trim() !== '') {
-        showLoading();
-        showToast('Obteniendo información de tiendas...', 'info');
-        
-        try {
-            // Obtener automáticamente las tiendas usando el token
-            const storesResponse = await fetch(`${API_BASE}/loyverse/stores`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    accessToken: accessToken.trim()
-                })
-            });
-            
-            const storesData = await storesResponse.json();
-            
-            let storeId = '';
-            
-            if (storesResponse.ok && storesData.stores && storesData.stores.length > 0) {
-                if (storesData.stores.length === 1) {
-                    // Si solo hay una tienda, usar automáticamente
-                    storeId = storesData.stores[0].id;
-                    showToast(`✓ Tienda encontrada: ${storesData.stores[0].name}`, 'success');
-                } else {
-                    // Si hay múltiples tiendas, mostrar opciones
-                    const storeOptions = storesData.stores.map((store, index) => 
-                        `${index + 1}. ${store.name} (ID: ${store.id})`
-                    ).join('\n');
-                    
-                    const selection = prompt(`Tiendas encontradas:\n${storeOptions}\n\nIngresa el número de tienda (1-${storesData.stores.length}):`);
-                    const storeIndex = parseInt(selection) - 1;
-                    
-                    if (storeIndex >= 0 && storeIndex < storesData.stores.length) {
-                        storeId = storesData.stores[storeIndex].id;
-                    } else {
-                        throw new Error('Selección inválida');
-                    }
-                }
-            } else {
-                // Fallback manual si la API falla
-                storeId = prompt('No se pudieron obtener tiendas automáticamente.\nIngresa manualmente el Store ID de Loyverse:') || '';
-            }
-            
-            LOYVERSE_CONFIG.accessToken = accessToken.trim();
-            LOYVERSE_CONFIG.storeId = storeId.trim();
-            LOYVERSE_CONFIG.enabled = true;
-            
-            // Guardar en localStorage
-            localStorage.setItem('loyverse_config', JSON.stringify(LOYVERSE_CONFIG));
-            showToast('✓ Configuración de Loyverse guardada correctamente', 'success');
-            
-            // Mostrar resumen de configuración
-            console.log('Loyverse configurado:', {
-                tokenLength: accessToken.length,
-                storeId: storeId || 'No especificado',
-                enabled: true
-            });
-            
-        } catch (error) {
-            console.error('Error configurando Loyverse:', error);
-            showToast(`Error: ${error.message}`, 'error');
-        } finally {
-            hideLoading();
-        }
-    } else if (accessToken !== null) {
-        showToast('Access Token es requerido', 'error');
-    }
-}
-
-// Cargar configuración de Loyverse desde localStorage
-function loadLoyverseConfig() {
-    const savedConfig = localStorage.getItem('loyverse_config');
-    if (savedConfig) {
-        const config = JSON.parse(savedConfig);
-        LOYVERSE_CONFIG.accessToken = config.accessToken;
-        LOYVERSE_CONFIG.storeId = config.storeId;
-        LOYVERSE_CONFIG.enabled = config.enabled;
-    }
-}
-
-// Enviar venta a Loyverse API a través de nuestro proxy
-async function sendToLoyverse(saleData, customerData = null) {
-    if (!LOYVERSE_CONFIG.enabled || !LOYVERSE_CONFIG.accessToken) {
-        console.log('Loyverse no configurado, omitiendo envío');
-        return null;
-    }
-    
-    try {
-        // Enviar a nuestro proxy server que maneja CORS
-        const response = await fetch(`${API_BASE}/loyverse/receipt`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                accessToken: LOYVERSE_CONFIG.accessToken,
-                storeId: LOYVERSE_CONFIG.storeId,
-                saleData: saleData,
-                customerData: customerData
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok && result.success) {
-            console.log('Venta enviada a Loyverse:', result);
-            
-            // Activar impresión automática en Loyverse
-            if (result.receipt_number) {
-                await triggerLoyversePrint(result.receipt_number);
-            }
-            
-            return result;
-        } else {
-            console.error('Error al enviar a Loyverse:', result);
-            throw new Error(result.error || `Error Loyverse: ${response.status}`);
-        }
-    } catch (error) {
-        console.error('Error en integración Loyverse:', error);
-        showToast(`Error al sincronizar con Loyverse: ${error.message}`, 'warning');
-        return null;
-    }
-}
-
-// Activar impresión en Loyverse (si el dispositivo está configurado)
-async function triggerLoyversePrint(receiptNumber) {
-    try {
-        // Esta función depende de la configuración específica de Loyverse
-        // En la mayoría de casos, si Loyverse está configurado para auto-imprimir,
-        // esto sucederá automáticamente al crear el recibo
-        console.log(`Recibo ${receiptNumber} creado en Loyverse - impresión automática activada`);
-    } catch (error) {
-        console.error('Error al activar impresión Loyverse:', error);
-    }
-}
+// La configuración de impresión ahora es local
 
 // Initialize ticket modal events
 document.addEventListener('DOMContentLoaded', function() {
@@ -2651,14 +2481,7 @@ async function completarVentaRapida(shouldPrint = false) {
             }
         });
         
-        // Enviar a Loyverse API si está configurado
-        const loyverseResult = await sendToLoyverse(saleData, null);
-        
-        if (loyverseResult) {
-            showToast('Venta registrada y enviada a Loyverse ✓', 'success');
-        } else {
-            showToast('Venta registrada correctamente ✓', 'success');
-        }
+        showToast('Venta registrada correctamente ✓', 'success');
         
         if (shouldPrint && result.receiptHtml) {
             // Crear un nuevo documento para la impresión
@@ -2715,14 +2538,8 @@ async function venderRapida() {
             }
         });
         
-        // Enviar a Loyverse API si está configurado
-        const loyverseResult = await sendToLoyverse(saleData, null);
-        
-        if (loyverseResult) {
-            showToast('Venta registrada y enviada a Loyverse ✓', 'success');
-        } else {
-            showToast('Venta registrada correctamente ✓', 'success');
-        }
+        // Venta registrada correctamente
+        showToast('Venta registrada correctamente ✓', 'success');
         
         // Limpiar venta
         cancelarVentaRapida();
